@@ -1,13 +1,14 @@
-function Room(id,width,height) {
+function Room(id,width,height,canvas) {
 
 	
 	this.width = width;		
 	this.height = height;
 	
-	this.div = document.getElementById(id);
-	this.div.style.width  = width + "px";
-	this.div.style.height = height + "px";
-	
+	if ( id ) { 
+    	this.div = document.getElementById(id);
+    	this.div.style.width  = width + "px";
+    	this.div.style.height = height + "px";
+	}
 	/**
 	* Given X y coordinates, return true if the dimensions will hit the wall
 	*/
@@ -29,7 +30,7 @@ function Room(id,width,height) {
 		
 		var hit = false;
 		
-		if ( cornerDim.x < 0 || cornerDim.y < 0 || cornerDim.x > width || cornerDim.x > height || cornerDim.y > width || cornerDim.y > height ) {
+		if ( cornerDim.x <= 0 || cornerDim.y <= 0 || cornerDim.x >= width || cornerDim.x >= height || cornerDim.y >= width || cornerDim.y >= height ) {
 			
 			
 			hit = true;
@@ -50,6 +51,7 @@ function Room(id,width,height) {
 	}
 	/**
 	* Given a x, y coordinate and degree, returns the distance to the wall
+	* degree is based on 0 being up;
 	*/
 	this.getWallDistance = function(x,y,deg) {
 
@@ -57,7 +59,7 @@ function Room(id,width,height) {
 		
 		var g = new Geometry();
 		
-		var dim = calcBeamDestination(x,y,deg);
+		var dim = this.calcBeamDestination(x,y,deg);
 
 		
 		var beamStart 	= g.point(x,y);
@@ -92,22 +94,22 @@ function Room(id,width,height) {
 		
 		if ( lTopDist ) {
 			
-			canvas.beamDestination(lTopDist);
+			if (canvas) canvas.beamDestination(lTopDist);
 			distance = beamStart.distance( lTopDist );
 		}
 		else if ( lRightDist ) {
 			
-			canvas.beamDestination(lRightDist);
+			if (canvas) canvas.beamDestination(lRightDist);
 			distance = beamStart.distance( lRightDist );
 		}
 		else if ( lBottomDist ) {
 			
-			canvas.beamDestination(lBottomDist);
+			if (canvas) canvas.beamDestination(lBottomDist);
 			distance = beamStart.distance( lBottomDist );
 		}
 		else if ( lLeftDist ) {
 			
-			canvas.beamDestination(lLeftDist);
+			if (canvas) canvas.beamDestination(lLeftDist);
 			distance = beamStart.distance( lLeftDist );
 		}
 
@@ -116,16 +118,39 @@ function Room(id,width,height) {
 		return distance;
 		
 	}
-	function calcBeamDestination(x,y,deg) {
+    this.calcBeamDestination = function(x,y,deg) {
 		
 			var x10 = x
 			var y10 = y
-			var distance = width;
 			
-			if ( height > width ) {
-				
-				distance = 	height;
-			}
+			// Max distance we can go is the greater of the distance to any of the 
+			// corners
+			var robotVector = Vector.create([x,y]);
+			
+			var topLeftDist  = robotVector.distanceFrom(  Vector.create([ 0, 0]) );
+			var topRightDist = robotVector.distanceFrom( Vector.create([ 0, width]) );
+			var botRightDist = robotVector.distanceFrom( Vector.create([ height, 0]) );
+			var botLeftDist  = robotVector.distanceFrom( Vector.create([ height, width]) );
+			
+			var maxDistance = 0;
+			
+            if ( topLeftDist > maxDistance ) {
+                
+                maxDistance = topLeftDist;
+            }			
+            else if ( topRightDist > maxDistance ) {
+                
+                maxDistance = topRightDist;
+            }			
+            else if ( botRightDist > maxDistance ) {
+                
+                maxDistance = botRightDist;
+            }			
+            else if ( botLeftDist > maxDistance ) {
+                
+                maxDistance = botLeftDist;
+            }			
+            var distance = maxDistance + 20; // Add 20 to make sure goes beyond wall
 
 
 			var halfHeight = distance * 2;
@@ -143,9 +168,9 @@ function Room(id,width,height) {
 			dim.y = y10 - radius * Math.sin(radRotate + angle);
 			
 
-			//console.log('calcBeamDestination dim=',dim);
+			console.log('calcBeamDestination distance=' + distance + ' dim=',dim);
 			
-			canvas.beamLine(x,y,dim.x,dim.y);
+			if (canvas ) canvas.beamLine(x,y,dim.x,dim.y);
 			
 			return dim;
 	}	

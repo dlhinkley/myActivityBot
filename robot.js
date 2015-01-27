@@ -6,9 +6,7 @@ function Robot(id,room,x,y) {
 	var self = this;
 	self.x = x;
 	self.y = y;
-	
-	var g = new Geometry();
-	
+		
 	var loc = {
 				"heading": {
 							"deg": 0,
@@ -29,12 +27,13 @@ function Robot(id,room,x,y) {
 	var height = 200;
 	
 
-	var div = document.getElementById(id);
-	
-	
-	div.style.width  = width + "px";
-	div.style.height = height + "px";
-	
+    if ( id ) {
+    	var div = document.getElementById(id);
+    	
+    	
+    	div.style.width  = width + "px";
+    	div.style.height = height + "px";
+	}
 	var speed = 2,
 	    color = '#c00';
 	    
@@ -51,9 +50,11 @@ function Robot(id,room,x,y) {
 		width = w;
 		height = h;
 		
-		div.style.width  = width + "px";
-		div.style.height = height + "px";
+		if ( id ) {
 		
+    		div.style.width  = width + "px";
+    		div.style.height = height + "px";
+		}
 		render();
 	}
 	self.setPosition = function(x,y) {
@@ -244,41 +245,44 @@ function Robot(id,room,x,y) {
 	}
 	function render() {
 		
-		// TL calculation
-		//
-		calcCorners(self.x, self.y, loc.heading.deg);
-			    	    
-	    rotate(div,loc.heading.deg);
-	    
-	    div.style.top = self.y - (height / 2);
-	    div.style.left = self.x - (width / 2);
-	    
-			
-		document.getElementById('tl').innerHTML = 'x=' + Math.round(loc.dim.tl.x) + '<br>y=' + Math.round(loc.dim.tl.y);
-		document.getElementById('tr').innerHTML = 'x=' + Math.round(loc.dim.tr.x) + '<br>y=' + Math.round(loc.dim.tr.y);
-		document.getElementById('br').innerHTML = 'x=' + Math.round(loc.dim.br.x) + '<br>y=' + Math.round(loc.dim.br.y);
-		document.getElementById('bl').innerHTML = 'x=' + Math.round(loc.dim.bl.x) + '<br>y=' + Math.round(loc.dim.bl.y);
-
-		document.getElementById('coord').innerHTML = 'x=' + Math.round( self.x ) + ' y=' + Math.round( self.y );
+		if (id ) {
 		
-		var pointADiv = document.getElementById('pointA');
-		var pointBDiv = document.getElementById('pointB');
-		
-		pointADiv.style.left = self.x - 10;
-		pointADiv.style.top = self.y ;
-	    
-		pointBDiv.style.left = self.x - 10;
-		pointBDiv.style.top = self.y;
-	    
-		
-		var frontADiv = document.getElementById('frontA');
-		var frontBDiv = document.getElementById('frontB');
-		
-		frontADiv.style.left = loc.dim.point.x - 10;
-		frontADiv.style.top = loc.dim.point.y ;
-	    
-		frontBDiv.style.left = loc.dim.point.x - 10;
-		frontBDiv.style.top = loc.dim.point.y;
+    		// TL calculation
+    		//
+    		calcCorners(self.x, self.y, loc.heading.deg);
+    			    	    
+    	    rotate(div,loc.heading.deg);
+    	    
+    	    div.style.top = self.y - (height / 2);
+    	    div.style.left = self.x - (width / 2);
+    	    
+    			
+    		document.getElementById('tl').innerHTML = 'x=' + Math.round(loc.dim.tl.x) + '<br>y=' + Math.round(loc.dim.tl.y);
+    		document.getElementById('tr').innerHTML = 'x=' + Math.round(loc.dim.tr.x) + '<br>y=' + Math.round(loc.dim.tr.y);
+    		document.getElementById('br').innerHTML = 'x=' + Math.round(loc.dim.br.x) + '<br>y=' + Math.round(loc.dim.br.y);
+    		document.getElementById('bl').innerHTML = 'x=' + Math.round(loc.dim.bl.x) + '<br>y=' + Math.round(loc.dim.bl.y);
+    
+    		document.getElementById('coord').innerHTML = 'x=' + Math.round( self.x ) + ' y=' + Math.round( self.y );
+    		
+    		var pointADiv = document.getElementById('pointA');
+    		var pointBDiv = document.getElementById('pointB');
+    		
+    		pointADiv.style.left = self.x - 10;
+    		pointADiv.style.top = self.y ;
+    	    
+    		pointBDiv.style.left = self.x - 10;
+    		pointBDiv.style.top = self.y;
+    	    
+    		
+    		var frontADiv = document.getElementById('frontA');
+    		var frontBDiv = document.getElementById('frontB');
+    		
+    		frontADiv.style.left = loc.dim.point.x - 10;
+    		frontADiv.style.top = loc.dim.point.y ;
+    	    
+    		frontBDiv.style.left = loc.dim.point.x - 10;
+    		frontBDiv.style.top = loc.dim.point.y;
+		}
 	}
 	
 	init();

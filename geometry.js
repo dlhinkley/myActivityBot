@@ -1,3 +1,14 @@
+/*! JointJS v0.9.2 - JavaScript diagramming library  2014-09-17 
+
+ http://jointjs.com/downloads/geometry.js
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+//      Geometry library.
+//      (c) 2011-2013 client IO
+
+
 function Geometry() {
 
 
@@ -260,7 +271,7 @@ function Geometry() {
         //
         angle: function() {
 	        
-	                    var lat1 = toRad(this.start.y);
+	        var lat1 = toRad(this.start.y);
             var lat2 = toRad(this.end.y);
             var lon1 = this.start.x;
             var lon2 = this.end.x;
