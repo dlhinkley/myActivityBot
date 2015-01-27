@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <title>My first game</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="gridPaper" class="gridPaper">
+        	<div class="row">
+            	<div class="corner"></div>
+            	<div id="topScale" class="topScale"></div>
+            	<div class="corner"></div>
+        	</div>
+        	<div class="row">
+	            <div id="leftScale" class="leftScale"></div>
+		        <div id="room" class="room">
+					<canvas class="roomCanvas" id="roomCanvas"></canvas>
+				    <div id="pointA" class="pointA"></div>
+				    <div id="pointB" class="pointB"></div>
+			        <div id="robot" class="robot">
+				        <div id="tl" class="tl"></div>
+				        <div id="bl" class="bl"></div>
+				        <div id="tr" class="tr"></div>
+				        <div id="br" class="br"></div>
+				        <div id="coord" class="coord">x=,y=</div>
+				        <div class="front">x</div>
+			        </div>
+				    <div id="frontA" class="frontA"></div>
+				    <div id="frontB" class="frontB"></div>
+		        </div>
+				<div id="rightScale" class="rightScale"></div>
+        	</div>
+        	<div class="row">
+            	<div class="corner"></div>
+            	<div id="bottomScale" class="bottomScale"></div>
+            	<div class="corner"></div>
+        	</div>
+        </div>
+        <input type="button" onclick="turnLeft()" name="turn" value="<R" />
+        <input type="button" onclick="turnRight()" name="turn" value="R>" />
+        <input type="button" onclick="pushBackward()" name="backward" value="B" />
+        <input type="button" onclick="pushForward()" name="forward" value="F" />
+        <input type="button" onclick="stopDriving()" name="forward" value="STOP" />
+        <script type="text/javascript" src="geometry.js"></script>
+        <script type="text/javascript" src="robot.js"></script>
+        <script type="text/javascript" src="room.js"></script>
+        <script type="text/javascript" src="grid.js"></script>
+        <script type="text/javascript" src="canvas.js"></script>
+        <script type="text/javascript" src="main.js"></script>
+    </body>
+</html>

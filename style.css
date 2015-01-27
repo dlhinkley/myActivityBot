@@ -1,0 +1,125 @@
+.roomCanvas {
+	position: absolute;
+	z-index: -1;
+}
+.gridPaper {
+	
+    display: table;
+	z-index: 10;
+	border: 1px solid blue;
+}
+.row {
+	
+	display:table-row;
+}
+.corner {
+	
+	
+}
+.bottomScale {
+	position: relative;
+	display:table-cell;	
+	z-index: 10;
+}
+.topScale {
+	position: relative;
+	display:table-cell;
+	z-index: 10;
+}
+.leftScale {
+	position: relative;
+	display:table-cell;
+	width: 40px;
+	z-index: 10;
+}
+.rightScale {
+	position: relative;
+	display:table-cell;
+	width: 40px;
+	
+	z-index: 10;
+}
+.verticalScale,.horizontalScale {
+	position: absolute;
+	z-index: 10;	
+	font-family: arial;
+	font-size: 10px;
+}
+
+.verticalLine,.horizontalLine {
+	position: absolute;
+	z-index: 10;	
+	border: 1px solid #ddd;
+}
+.room {
+	display:table-cell;
+	border:1px solid green;
+	position: relative;
+/* 	background-image: url('graph_paper.jpg'); */
+	z-index: 200;
+}
+
+.robot {
+	border:1px solid red;
+	position: absolute;
+	font-family: arial;
+	font-size: 10px;
+	z-index: 100;
+}
+.pointA, .frontA {
+	
+	position:absolute;
+	border: 1px solid red;
+	-ms-transform: rotate(45deg); /* IE 9 */
+    -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+    transform: rotate(45deg);
+	width: 20px;
+}
+.pointB, .frontB {
+	
+	position:absolute;
+	border: 1px solid red;
+	-ms-transform: rotate(315deg); /* IE 9 */
+    -webkit-transform: rotate(315deg); /* Chrome, Safari, Opera */
+    transform: rotate(315deg);
+	width: 20px;
+
+}
+.frontA, .frontB {
+	
+	border: 1px solid blue;
+}
+.front {
+	
+	position:relative;
+	width: 100%;
+	text-align: center;
+	color: red;
+}
+.tr {
+	position:absolute;
+	top: 2;
+	right: 2;
+}
+.br {
+	position:absolute;
+	bottom: 2;
+	right: 2;
+}
+.tl {
+	position:absolute;
+	top: 2;
+	left: 2;
+}
+.bl {
+	position:absolute;
+	bottom: 2;
+	left: 2;
+}
+.coord {
+	position: absolute;
+    text-align: center;
+    width: 100%;
+    top:  40%;
+	left: 0;
+}
