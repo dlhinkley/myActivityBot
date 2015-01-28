@@ -94,22 +94,22 @@ function Room(id,width,height,canvas) {
 		
 		if ( lTopDist ) {
 			
-			if (canvas) canvas.beamDestination(lTopDist);
+			if (canvas) canvas.drawSquare( lTopDist.x, lTopDist.y, 8, "green" );
 			distance = beamStart.distance( lTopDist );
 		}
 		else if ( lRightDist ) {
 			
-			if (canvas) canvas.beamDestination(lRightDist);
+			if (canvas) canvas.drawSquare( lRightDist.x, lRightDist.y, 8, "green" );
 			distance = beamStart.distance( lRightDist );
 		}
 		else if ( lBottomDist ) {
 			
-			if (canvas) canvas.beamDestination(lBottomDist);
+			if (canvas) canvas.drawSquare( lBottomDist.x, lBottomDist.y, 8, "green" );
 			distance = beamStart.distance( lBottomDist );
 		}
 		else if ( lLeftDist ) {
 			
-			if (canvas) canvas.beamDestination(lLeftDist);
+			if (canvas) canvas.drawSquare( lLeftDist.x, lLeftDist.y, 8, "green" );
 			distance = beamStart.distance( lLeftDist );
 		}
 
@@ -170,7 +170,7 @@ function Room(id,width,height,canvas) {
 
 			console.log('calcBeamDestination distance=' + distance + ' dim=',dim);
 			
-			if (canvas ) canvas.beamLine(x,y,dim.x,dim.y);
+			if (canvas ) canvas.drawLine( x, y, dim.x, dim.y, 'blue');
 			
 			return dim;
 	}	

@@ -2,6 +2,24 @@
 	position: absolute;
 	z-index: -1;
 }
+.roomMapCanvas  {
+    z-index: 1;
+    position:absolute;
+    left:0px;
+    top:0px;    
+}
+.canvasLayer2  {
+    z-index: 2;
+    position:absolute;
+    left:0px;
+    top:0px;  
+}
+.canvasLayer3  {
+    z-index: 3;
+    position:absolute;
+    left:0px;
+    top:0px; 
+}
 .gridPaper {
 	
     display: table;

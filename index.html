@@ -2,7 +2,7 @@
     <head>
         <title>My first game</title>
 		<link rel="stylesheet" type="text/css" href="style.css">
-		<script src="jquery.min.js"></script>
+		<script src="scripts/lib/jquery.min.js"></script>
     </head>
     <body>
         <div id="gridPaper" class="gridPaper">
@@ -15,6 +15,9 @@
 	            <div id="leftScale" class="leftScale"></div>
 		        <div id="room" class="room">
 					<canvas class="roomCanvas" id="roomCanvas"></canvas>
+                    <canvas class="roomMapCanvas" id="roomMapCanvas"></canvas>
+                    <canvas class="canvasLayer2" id="layer2"></canvas>
+                    <canvas class="canvasLayer3" id="layer3"></canvas>
 				    <div id="pointA" class="pointA"></div>
 				    <div id="pointB" class="pointB"></div>
 			        <div id="robot" class="robot">
@@ -36,22 +39,21 @@
             	<div class="corner"></div>
         	</div>
         </div>
-         <canvas id="demo-canvas" width="650" height="400"></canvas>
         <input type="button" onclick="turnLeft()" name="turn" value="<R" />
         <input type="button" onclick="turnRight()" name="turn" value="R>" />
         <input type="button" onclick="pushBackward()" name="backward" value="B" />
         <input type="button" onclick="pushForward()" name="forward" value="F" />
         <input type="button" onclick="stopDriving()" name="forward" value="STOP" />
-        <script type="text/javascript" src="sylvester.js"></script>
-        <script type="text/javascript" src="polygonPad.js"></script>
-        <script type="text/javascript" src="geometry.js"></script>
-        <script type="text/javascript" src="polyk.js"></script>
-        <script type="text/javascript" src="robot.js"></script>
-        <script type="text/javascript" src="room.js"></script>
-        <script type="text/javascript" src="grid.js"></script>
-        <script type="text/javascript" src="canvas.js"></script>
-        <script type="text/javascript" src="utility.js"></script>
-        <script type="text/javascript" src="maproom.js"></script>
-        <script type="text/javascript" src="main.js"></script>
+        <script type="text/javascript" src="scripts/lib/sylvester.js"></script>
+        <script type="text/javascript" src="scripts/lib/polygonPad.js"></script>
+        <script type="text/javascript" src="scripts/lib/geometry.js"></script>
+        <script type="text/javascript" src="scripts/lib/polyk.js"></script>
+        <script type="text/javascript" src="scripts/robot.js"></script>
+        <script type="text/javascript" src="scripts/room.js"></script>
+        <script type="text/javascript" src="scripts/grid.js"></script>
+        <script type="text/javascript" src="scripts/canvas.js"></script>
+        <script type="text/javascript" src="scripts/utility.js"></script>
+        <script type="text/javascript" src="scripts/maproom.js"></script>
+        <script type="text/javascript" src="scripts/main.js"></script>
     </body>
 </html>

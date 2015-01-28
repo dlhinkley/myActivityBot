@@ -37,6 +37,7 @@ int main()                                    // main function
 
 */
 var canvas		= new Canvas("roomCanvas",400, 400);
+var mapCanvas   = new MapCanvas(400, 400);
 var room  		= new Room("room", 400, 400,canvas);
 var gridPaper  	= new GridPaper(room);
 var robot 		= new Robot("robot",room);

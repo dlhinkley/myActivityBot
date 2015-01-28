@@ -62,15 +62,11 @@ function Canvas(id,width,height) {
 
       context.stroke();			
 	}
-	this.beamLine = function (x1,y1,x2,y2) {
-		
-		this.drawLine(x1,y1,x2,y2,'blue');
-	
-	}
-	this.beamDestination = function(point) {
-		
-			context.fillStyle = "green";
-			context.fillRect(point.x - 4,point.y - 4, 8, 8);
-		
-	}
+}
+
+
+function MapCanvas( width, height) {
+    
+      var canvas = new Canvas("roomMapCanvas", , );
+      
 }
