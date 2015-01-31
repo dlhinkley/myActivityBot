@@ -7,6 +7,7 @@ function MapRoom(robot) {
 	var walls   = new Walls(canvas);
 	var turnDeg = 0;	
 	var gridSize = 50;
+	var mapGrid = null;
 	
 	this.complete = false;
 	
@@ -158,25 +159,82 @@ function MapRoom(robot) {
     	// Start at robot position, go right
     	var centerX = robot.x;
     	var centerY = robot.y;
-    	var mapGrid = new MapGrid();
+    	 
+        mapGrid = new MapGrid();
     	
     	
     	// Go north to wall until touching wall
     	//
-    	do {
-        	
-        	mapGrid.addCell( new MapCell( centerX, centerY, 50 ) );
-        	
-        	centerY -= gridSize;
-        	
-    	} while( ! squareTouchesWall( centerX, centerY) )
+        fillNorth(centerX, centerY);
     	
-    	var mapCell = new MapCell( centerX, centerY, 50 );
-    	mapCell.flagAsWall();
-    	
+	}
+	/**
+	* S
+	*/
+	function fillEast(startX, startY, westCell) {
+	
+        var mapCell = null;
+        
+        startX   += gridSize;       // Point to the next location
+
+        // Keep looping as long as we're not touching the wall
+        while( ! squareTouchesWall( startX, startY) ) {
+        
+            mapCell = new MapCell( startX, startY, gridSize ); // Create mapCell object
+            
+            mapCell.cellWest = westCell; // Save reference to west cell
+            
+            mapGrid.addCell( mapCell );  // Save cell to grid
+            
+            fillEast(startX, startY, mapCell);
+            
+            westCell = mapCell;        // Save the prior cell
+            startX   += gridSize;       // Point to the next location
+        
+        } 
+        
+        var mapCell = new MapCell( startX, startY, gridSize ); // Save the final cell as the wall
+        
+        mapCell.flagAsWall(); // Flag it as a wall cell
+        mapCell.cellWest = westCell;
+        
         mapGrid.addCell( mapCell );
-    	
-    	
+	}
+	/**
+	* Given the robot's x, y position, fill all the boxes north until hitting the wall
+	* when the wall is hit, mark that box as containing the wall
+	*/
+	function fillNorth(startX, startY) {
+	
+        var mapCell = null;
+        var southCell = null;
+        
+        do {
+        
+            mapCell = new MapCell( startX, startY, gridSize ); // Create mapCell object
+            
+            // If this is not the first loop, point to the prior cell as the southern cell
+            if ( southCell !== null ) {
+                
+                mapCell.cellSouth = southCell;
+            }
+            mapGrid.addCell( mapCell ); // Save cell to grid
+            
+            fillEast(startX, startY, mapCell);  // Fill the cells to the east
+            
+            southCell = mapCell;        // Save the prior cell
+            startY   -= gridSize;       // Point to the next location
+        
+        } while( ! squareTouchesWall( startX, startY) ) // Keep looping as long as we're not touching the wall
+        
+        var mapCell = new MapCell( startX, startY, gridSize ); // Save the final cell as the wall
+        
+        mapCell.flagAsWall(); // Flag it as a wall cell
+        mapCell.cellSouth = southCell;
+        
+        mapGrid.addCell( mapCell );
+        
+        fillEast(startX, startY, mapCell); // Fill the cells to the east
 	}
 	function squareTouchesWall(x, y) {
     	
@@ -206,12 +264,15 @@ function MapRoom(robot) {
     */
     function MapCell(x, y, size ) {
         
-        var EMPTY = 0;
-        var WALL = 1;
+        var isWall = false;
         
         this.x = x;
         this.y = y;
-        this.type = EMPTY;
+        
+        this.cellNorth = null;
+        this.cellSouth = null;
+        this.cellEast = null;
+        this.cellWest = null;
         
         canvas.drawBox(x, y, gridSize, '#00FF00');
         
@@ -222,7 +283,7 @@ function MapRoom(robot) {
             
             console.log('MapCell.setWall start gridSize=' + gridSize);
             
-            this.type = WALL;
+            isWall = true;
             canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
         };
     }
