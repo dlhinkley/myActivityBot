@@ -21,6 +21,14 @@ function Canvas(id,width,height) {
 			context.fillStyle = color;
 			context.fillRect(x - (size/2), y - (size/2), size, size)
 	}
+	this.drawBox = function(x, y, size, color) {
+		
+		//console.log('drawSquare x=' + x +  '  y=' + y +  ' size=' + size + ' color=' + color);
+
+			context.fillStyle = color;
+			context.strokeRect(x - (size/2), y - (size/2), size, size)
+	}
+
 	this.drawCircle = function(x,y,r,color) {
 		
 		var radius = r;
@@ -64,9 +72,3 @@ function Canvas(id,width,height) {
 	}
 }
 
-
-function MapCanvas( width, height) {
-    
-      var canvas = new Canvas("roomMapCanvas", , );
-      
-}

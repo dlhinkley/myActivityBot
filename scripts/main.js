@@ -37,7 +37,7 @@ int main()                                    // main function
 
 */
 var canvas		= new Canvas("roomCanvas",400, 400);
-var mapCanvas   = new MapCanvas(400, 400);
+
 var room  		= new Room("room", 400, 400,canvas);
 var gridPaper  	= new GridPaper(room);
 var robot 		= new Robot("robot",room);
@@ -217,19 +217,20 @@ function completeMission() {
 		
 		mapRoom.scanInitial();
 	}
+
 	// if no route, get the route
+
 	else if ( route === null  ) {
 		
-		console.log('route=' + route);
 		// Draw wall
 		canvas.clear();
-		mapRoom.getWalls().plotWalls();
 		
 		route = mapRoom.calcScanRoute();
 		
 		console.log('got route',route);
 		
 	}
+
 
 /*
 	// If there's more places to drive, drive there
@@ -241,6 +242,7 @@ function completeMission() {
 */
 
 	else {
+    	canvas.clear(); 
 		
 		stopDriving();
 	}

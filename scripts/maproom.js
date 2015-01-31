@@ -1,13 +1,14 @@
 
-function MapRoom(robot,canvas) {
-	
-	var self = this;
-	var wallBuffer = 100; // Distance new routes will stay from wall
-	var g = new Geometry();
+function MapRoom(robot) {
+
+    var canvas  = new Canvas("roomMapCanvas",400, 400);
+	var self    = this;
+	var g       = new Geometry();
+	var walls   = new Walls(canvas);
+	var turnDeg = 0;	
+	var gridSize = 50;
 	
 	this.complete = false;
-	var walls = new Walls();
-	var turnDeg = 0;	
 	
 	
 	/*
@@ -35,6 +36,8 @@ function MapRoom(robot,canvas) {
 			
 			
 			this.complete = true;
+    		canvas.clear();
+    		walls.plotWalls();
 		}		
 	}
 	/*
@@ -63,14 +66,18 @@ function MapRoom(robot,canvas) {
 		
 		console.log('calcPoint newPoint=',newPoint);
 		
-		//canvas.writeCoords( newPoint.x, newPoint.y);
-		if (canvas) canvas.distanceEnd( newPoint.x, newPoint.y);
+		
+		if (canvas)
+		    canvas.drawCircle(newPoint.x, newPoint.y,4,'purple');
 
 		return newPoint;
 	}
 
 	self.calcScanRoute = function() {
+	
+	    createMapGrid();
 		
+/*
 		var routePointArray = [];
 		var robotCtrPoint = g.point( robot.x, robot.y);
 		
@@ -91,13 +98,15 @@ function MapRoom(robot,canvas) {
 			
 			canvas.drawLine( start.x, start.y, end.x,  end.y, 'blue' );
 
+
 			//routePointArray.push(routePoint);
 		}
 
 		console.log('MapRoom.calcScanRoute end paddingPolygon=',paddingPolygon);
-
-		return routePointArray;
+*/
+		return true;
 	}
+
 	function calcRoutePoint(robotCtrPoint, endPoint, distance) {
 							
 			var measureLine = g.line(robotCtrPoint, endPoint );
@@ -143,13 +152,86 @@ function MapRoom(robot,canvas) {
 		return g.point(px,py);		
 		
 	}
+	
+	function createMapGrid() {
+    	
+    	// Start at robot position, go right
+    	var centerX = robot.x;
+    	var centerY = robot.y;
+    	var mapGrid = new MapGrid();
+    	
+    	
+    	// Go north to wall until touching wall
+    	//
+    	do {
+        	
+        	mapGrid.addCell( new MapCell( centerX, centerY, 50 ) );
+        	
+        	centerY -= gridSize;
+        	
+    	} while( ! squareTouchesWall( centerX, centerY) )
+    	
+    	var mapCell = new MapCell( centerX, centerY, 50 );
+    	mapCell.flagAsWall();
+    	
+        mapGrid.addCell( mapCell );
+    	
+    	
+	}
+	function squareTouchesWall(x, y) {
+    	
+    	
+    	return ! walls.containsPoint(x - (gridSize/2), y - (gridSize/2))
+    	    || ! walls.containsPoint(x + (gridSize/2), y - (gridSize/2))
+    	    || ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2))
+    	    || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2))
+	}
+	
+	/**
+	* Map Grid object
+	*/
+    function MapGrid() {
+        
+        var cells = [];
+        var xPtr = 0;
+        var yPtr = 0;
+        
+        this.addCell = function(mapCell) {
+            
+            cells.push( mapCell );
+        }
+    }
+    /**
+    * Map Cell object
+    */
+    function MapCell(x, y, size ) {
+        
+        var EMPTY = 0;
+        var WALL = 1;
+        
+        this.x = x;
+        this.y = y;
+        this.type = EMPTY;
+        
+        canvas.drawBox(x, y, gridSize, '#00FF00');
+        
+        /**
+        * Flag as wall
+        */
+        this.flagAsWall = function() {
+            
+            console.log('MapCell.setWall start gridSize=' + gridSize);
+            
+            this.type = WALL;
+            canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
+        };
+    }
 }
 
 
 
 
-
-function Walls() {
+function Walls(canvas) {
 	
 	var lineArray 	= [];
 	var prevPoint 	= null;
@@ -230,6 +312,23 @@ function Walls() {
 			if (canvas) canvas.drawSquare( lineArray[m].end.x, lineArray[m].end.y, 8, 'pink' );
 			
 		}
+	}
+	/**
+	* Given the location of a point, return true if point is inside the walls
+	*/
+	this.containsPoint = function(x,y) {
+    	
+    	var pointArray = [];
+    	
+		for (var m = 0; m < lineArray.length; m++ ) {
+		
+		    pointArray.push( lineArray[m].start.x );
+		    pointArray.push( lineArray[m].start.y );
+		    pointArray.push( lineArray[m].end.x );
+		    pointArray.push( lineArray[m].end.y );
+		    
+		}
+    	return PolyK.ContainsPoint( pointArray, x, y );
 	}
 
 }

@@ -51,7 +51,6 @@ function GridPaper(room) {
 	    var lineDiv = document.createElement("div");
 	    
 	    lineDiv.className = "horizontalLine";
-	    //lineDiv.innerHTML = "new div"
 	    lineDiv.style.top = pos;
 	    lineDiv.style.left = 0;
 	    lineDiv.style.width = room.width + "px";

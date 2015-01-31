@@ -36,3 +36,12 @@ function collinear( x1,  y1,  x2,  y2,  x3,  y3) {
 	
   return (y1 - y2) * (x1 - x3) == (y1 - y3) * (x1 - x2);
 }
+
+/*
+* given a child class and parent class extend
+*/
+function extend(ChildClass, ParentClass) {
+	ChildClass.prototype = new ParentClass();
+	ChildClass.prototype.constructor = ChildClass;
+}
+
