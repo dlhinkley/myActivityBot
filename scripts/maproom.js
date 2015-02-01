@@ -76,38 +76,25 @@ function MapRoom(robot) {
 
 	self.calcScanRoute = function() {
 	
-	    createMapGrid();
-		
-/*
-		var routePointArray = [];
-		var robotCtrPoint = g.point( robot.x, robot.y);
-		
-		canvas.drawCircle(robot.x, robot.y, 16,'magenta');
-		
-		var polygonPad = new PolygonPad(walls);
-		var paddingPolygon = polygonPad.getPaddingPolygon();
+	    var myMapCell = createMapGrid();
+	    
+	    console.log('calcScanRoute myMapCell=',myMapCell);
+	    routeWest(myMapCell);
 		
 
-		for (var m = 0; m < paddingPolygon.en.length - 1; m +=2 ) {
-			
-			// Get the next line
-			var start =  paddingPolygon.vertices[m];
-			var end =  paddingPolygon.vertices[m + 1];
-			
-            console.log('MapRoom.calcScanRoute start=',start);
-            console.log('MapRoom.calcScanRoute end=',end);
-			
-			canvas.drawLine( start.x, start.y, end.x,  end.y, 'blue' );
-
-
-			//routePointArray.push(routePoint);
-		}
-
-		console.log('MapRoom.calcScanRoute end paddingPolygon=',paddingPolygon);
-*/
 		return true;
 	}
+    function routeWest(cell) {
+        
+	    console.log('routeWest start cell=',cell);
+        if ( ! cell.isWall() ) {
+            
+            cell.cellWest.flagAsPath();
+            routeWest(cell.cellWest);
 
+        }
+	    console.log('routeWest end cell=',cell);
+    }
 	function calcRoutePoint(robotCtrPoint, endPoint, distance) {
 							
 			var measureLine = g.line(robotCtrPoint, endPoint );
@@ -165,77 +152,89 @@ function MapRoom(robot) {
     	
     	// Go north to wall until touching wall
     	//
-        fillNorth(centerX, centerY);
-    	
+        return createCell(centerX, centerY, 'main',0);
 	}
-	/**
-	* S
-	*/
-	function fillEast(startX, startY, westCell) {
-	
-        var mapCell = null;
-        
-        startX   += gridSize;       // Point to the next location
+	function createCell(x, y, direction, level) {
+    	
+    	console.log('createCell start direction=' + direction + ' level=' + level + ' x=' + x + ' y=' + y);
 
-        // Keep looping as long as we're not touching the wall
-        while( ! squareTouchesWall( startX, startY) ) {
-        
-            mapCell = new MapCell( startX, startY, gridSize ); // Create mapCell object
-            
-            mapCell.cellWest = westCell; // Save reference to west cell
-            
-            mapGrid.addCell( mapCell );  // Save cell to grid
-            
-            fillEast(startX, startY, mapCell);
-            
-            westCell = mapCell;        // Save the prior cell
-            startX   += gridSize;       // Point to the next location
-        
-        } 
-        
-        var mapCell = new MapCell( startX, startY, gridSize ); // Save the final cell as the wall
-        
-        mapCell.flagAsWall(); // Flag it as a wall cell
-        mapCell.cellWest = westCell;
+	
+        var mapCell = new MapCell( x, y, gridSize ); // Create mapCell object
         
         mapGrid.addCell( mapCell );
+    	    	
+        // Change color touching at south
+
+        if ( ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2)) || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2)) ) {
+            mapCell.flagAsWall(); // Flag it as a wall cell
+        }
+        else if ( mapGrid.get( x, y + gridSize )  ) {
+        
+            mapCell.cellSouth = mapGrid.get( x, y + gridSize );
+        }
+        else {
+                
+            mapCell.cellSouth = createCell( x, y + gridSize, 'south', level + 1); // Create cell to south
+        }
+        
+        
+        // Change color touching at north
+        if ( ! walls.containsPoint(x - (gridSize/2), y - (gridSize/2)) || ! walls.containsPoint(x + (gridSize/2), y - (gridSize/2)) ) {
+            
+            mapCell.flagAsWall(); // Flag it as a wall cell
+        }
+        else if ( mapGrid.get( x, y - gridSize )  ) {
+        
+            mapCell.cellNorth = mapGrid.get( x, y - gridSize );
+        }
+        else {
+            
+            mapCell.cellNorth = createCell( x, y - gridSize, 'north', level + 1); // Create cell to north
+        }
+        
+
+        
+        // Change color touching at east
+        if ( ! walls.containsPoint(x + (gridSize/2), y - (gridSize/2)) || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2)) ) {
+            
+            mapCell.flagAsWall(); // Flag it as a wall cell
+        }
+        else if ( mapGrid.get( x + gridSize, y ) ) {
+        
+            mapCell.cellWest = mapGrid.get( x + gridSize, y );
+        }
+        else {
+            
+            mapCell.cellWest = createCell( x + gridSize, y , 'east', level + 1); // Create cell east
+        }
+        
+
+        
+        // Change color touching at west
+        if ( ! walls.containsPoint(x - (gridSize/2), y - (gridSize/2)) || ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2)) ) {
+            
+            mapCell.flagAsWall(); // Flag it as a wall cell
+        }
+        else if ( mapGrid.get( x - gridSize, y ) ) {
+        
+            mapCell.cellEast = mapGrid.get( x - gridSize, y );
+        }
+        else {
+            
+            mapCell.cellEast = createCell( x - gridSize, y , 'west', level + 1); // Create cell east
+        }
+        
+    	console.log('createCell end direction=' + direction + ' level=' + level + ' x=' + x + ' y=' + y);
+        
+        return mapCell;
 	}
+
 	/**
 	* Given the robot's x, y position, fill all the boxes north until hitting the wall
 	* when the wall is hit, mark that box as containing the wall
 	*/
-	function fillNorth(startX, startY) {
-	
-        var mapCell = null;
-        var southCell = null;
-        
-        do {
-        
-            mapCell = new MapCell( startX, startY, gridSize ); // Create mapCell object
-            
-            // If this is not the first loop, point to the prior cell as the southern cell
-            if ( southCell !== null ) {
-                
-                mapCell.cellSouth = southCell;
-            }
-            mapGrid.addCell( mapCell ); // Save cell to grid
-            
-            fillEast(startX, startY, mapCell);  // Fill the cells to the east
-            
-            southCell = mapCell;        // Save the prior cell
-            startY   -= gridSize;       // Point to the next location
-        
-        } while( ! squareTouchesWall( startX, startY) ) // Keep looping as long as we're not touching the wall
-        
-        var mapCell = new MapCell( startX, startY, gridSize ); // Save the final cell as the wall
-        
-        mapCell.flagAsWall(); // Flag it as a wall cell
-        mapCell.cellSouth = southCell;
-        
-        mapGrid.addCell( mapCell );
-        
-        fillEast(startX, startY, mapCell); // Fill the cells to the east
-	}
+/*
+
 	function squareTouchesWall(x, y) {
     	
     	
@@ -244,6 +243,7 @@ function MapRoom(robot) {
     	    || ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2))
     	    || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2))
 	}
+*/
 	
 	/**
 	* Map Grid object
@@ -258,12 +258,30 @@ function MapRoom(robot) {
             
             cells.push( mapCell );
         }
+        
+        
+        this.get = function(x,y) {
+            
+            var cell = null;
+            ctr = 0;
+            while (cell === null && ctr < cells.length ) {
+                
+                if ( cells[ctr].x === x && cells[ctr].y === y ) {
+                    
+                    cell = cells[ctr];
+                }
+                ctr++;
+            }
+            return cell;
+        }
     }
     /**
     * Map Cell object
     */
     function MapCell(x, y, size ) {
         
+    	console.log('MapCell start x=' + x + ' y=' + y);
+
         var isWall = false;
         
         this.x = x;
@@ -280,11 +298,17 @@ function MapRoom(robot) {
         * Flag as wall
         */
         this.flagAsWall = function() {
-            
-            console.log('MapCell.setWall start gridSize=' + gridSize);
-            
+                        
             isWall = true;
             canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
+        };
+        this.isWall = function() {
+            
+            return isWall;
+        }
+        this.flagAsPath = function() {
+            
+            canvas.drawSquare(this.x, this.y, gridSize, '#0000FF');
         };
     }
 }

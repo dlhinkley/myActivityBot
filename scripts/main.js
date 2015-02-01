@@ -208,19 +208,19 @@ var nav = new Navigator();
 
 var route = null;
 
-function completeMission() {
+//function completeMission() {
 
-	
+
 	// Get a map of the room until complete
 	//
-	if ( ! mapRoom.complete ) {
+	while ( ! mapRoom.complete ) {
 		
 		mapRoom.scanInitial();
 	}
 
 	// if no route, get the route
 
-	else if ( route === null  ) {
+	//else if ( route === null  ) {
 		
 		// Draw wall
 		canvas.clear();
@@ -229,7 +229,7 @@ function completeMission() {
 		
 		console.log('got route',route);
 		
-	}
+	//}
 
 
 /*
@@ -241,16 +241,18 @@ function completeMission() {
 	}
 */
 
+/*
 	else {
     	canvas.clear(); 
 		
 		stopDriving();
 	}
+*/
 	
-}
+//}
 
 
-var intRef = setInterval(completeMission,50);
+//var intRef = setInterval(completeMission,50);
 //var intRef = setInterval(drive,1000);
 
 
