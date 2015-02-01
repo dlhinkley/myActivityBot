@@ -208,6 +208,7 @@ QUnit.test( "room.getWallDistance", function( assert ) {
     
 });
 
+/*
 
 QUnit.test( "mapRoom", function( assert ) {
 
@@ -274,10 +275,11 @@ QUnit.test( "mapRoom", function( assert ) {
     assert.equal( Math.round( mapRoom.getWalls().get(8).end.y ), 0, "Wall 8 end y");
     	
 });
+*/
 
 QUnit.test( "lineAngleDeg", function( assert ) {
 
-    var canvas = new Canvas("graph",400, 400);
+    //var canvas = new Canvas("graph",400, 400);
 	var g = new Geometry();
 
 
@@ -332,4 +334,12 @@ QUnit.test( "lineAngleDeg", function( assert ) {
 			var newEndPoint     = g.point.fromPolar(wallBuffer, rad(lineAngleDeg), startPoint); // calculate new line end based on original angle and startpoint
 			var newLine = g.line(startPoint,newEndPoint);
 */
+});
+QUnit.test( "PolyK Library", function( assert ) {
+
+    var canvas = new Canvas("graph",400, 400);
+
+    
+
+    
 });

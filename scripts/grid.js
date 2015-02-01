@@ -1,8 +1,13 @@
 
-function GridPaper(room) {
+function GridPaper(width,height) {
 	
 	var margin = 40; 
 	var step = 10;
+	
+	var roomDiv 	    = document.getElementById("room");
+    roomDiv.style.width  = width + "px";
+    roomDiv.style.height = height + "px";
+	
 	
 	var gridPaperDiv 	= document.getElementById("gridPaper");
 	var rightScaleDiv 	= document.getElementById("rightScale");
@@ -10,8 +15,8 @@ function GridPaper(room) {
 	var topScaleDiv 	= document.getElementById("topScale");
 	var bottomScaleDiv 	= document.getElementById("bottomScale");
 	
-	gridPaperDiv.style.width  = room.width + (margin * 2) + "px";
-	gridPaperDiv.style.height = room.height + (margin * 2) + "px";
+	gridPaperDiv.style.width  = width + (margin * 2) + "px";
+	gridPaperDiv.style.height = height + (margin * 2) + "px";
 	
 	function createVerticalLines() {
 				
@@ -19,11 +24,11 @@ function GridPaper(room) {
     	bottomScaleDiv.appendChild( getVerticalScale(10,0,"X") );
 
 	    	
-		for (var m = step; m < room.width; m += step) {
+		for (var m = step; m < width; m += step) {
 			
 			var lineDiv = getVerticalLine(m);
 			
-	    	room.div.appendChild(lineDiv);	
+	    	roomDiv.appendChild(lineDiv);	
 	    			
 	    	topScaleDiv.appendChild( getVerticalScale(20,m,m) );
 	    	bottomScaleDiv.appendChild( getVerticalScale(10,m,m) );
@@ -35,11 +40,11 @@ function GridPaper(room) {
     	leftScaleDiv.appendChild( getHorizontalScale(0,15,"Y") );
     	rightScaleDiv.appendChild( getHorizontalScale(0,5,"Y") );
 
-		for (var m = step; m < room.height; m += step) {
+		for (var m = step; m < height; m += step) {
 			
 			var lineDiv = getHorizontalLine(m);		
 				
-	    	room.div.appendChild(lineDiv);
+	    	roomDiv.appendChild(lineDiv);
 	    	
 	    	leftScaleDiv.appendChild( getHorizontalScale(m,15,m) );
 	    	rightScaleDiv.appendChild( getHorizontalScale(m,5,m) );
@@ -53,7 +58,7 @@ function GridPaper(room) {
 	    lineDiv.className = "horizontalLine";
 	    lineDiv.style.top = pos;
 	    lineDiv.style.left = 0;
-	    lineDiv.style.width = room.width + "px";
+	    lineDiv.style.width = width + "px";
 	    
 	    return lineDiv;
 	}
@@ -65,7 +70,7 @@ function GridPaper(room) {
 	    //lineDiv.innerHTML = "new div"
 	    lineDiv.style.top = 0;
 	    lineDiv.style.left = pos;
-	    lineDiv.style.height = room.height + "px";
+	    lineDiv.style.height = height + "px";
 	    
 	    return lineDiv;
 	}

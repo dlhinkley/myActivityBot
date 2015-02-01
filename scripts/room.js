@@ -1,14 +1,37 @@
 function Room(id,width,height,canvas) {
 
-	
-	this.width = width;		
-	this.height = height;
-	
-	if ( id ) { 
-    	this.div = document.getElementById(id);
-    	this.div.style.width  = width + "px";
-    	this.div.style.height = height + "px";
-	}
+    var walls, wallCanvas;
+   
+    function init() {
+    
+		var g = new Geometry();
+        
+        walls = [
+        		g.line(  g.point( 0, 0),                g.point(width/3,0)		), // Top wall left of door
+        		g.line(  g.point( width - width/3, 0), g.point(width,0)		), // Top wall right of door
+            	g.line(  g.point( width, 0),            g.point(width,height)	), // Left wall
+        		g.line(  g.point( width, height),       g.point(0,height)		), // right wall
+        		g.line(  g.point( 0, height),           g.point(0,0)			)  // bottom wall
+        ];	  
+        
+        wallCanvas		= new Canvas("roomWallCanvas",width, height);
+        
+        drawWalls();
+             
+    }
+    function drawWalls() {
+        
+		for (var m = 0; m < walls.length; m++ ) {
+			
+			///console.log('plotWalls start=' , lineArray[m].start);
+			//console.log('plotWalls end=' , lineArray[m].end);
+			 
+			wallCanvas.drawLine( walls[m].start.x, walls[m].start.y, walls[m].end.x,  walls[m].end.y, 'black' );
+			
+			wallCanvas.drawSquare( walls[m].start.x, walls[m].start.y, 8, 'black' );
+			wallCanvas.drawSquare( walls[m].end.x, walls[m].end.y, 8, 'black' );
+		}
+    }
 	/**
 	* Given X y coordinates, return true if the dimensions will hit the wall
 	*/
@@ -38,17 +61,7 @@ function Room(id,width,height,canvas) {
 		return hit;
 		
 	}
-	function plotLine(line,color) {
-		
-/*
-		ctx.beginPath();
-		ctx.moveTo(line.start.x,line.start.y);
-		ctx.lineTo(line.end.x, line.end.y);
-		ctx.strokeStyle = color;
 
-		ctx.stroke();	
-*/	
-	}
 	/**
 	* Given a x, y coordinate and degree, returns the distance to the wall
 	* degree is based on 0 being up;
@@ -68,57 +81,61 @@ function Room(id,width,height,canvas) {
 		//console.log('beamStart=',beamStart);
 		
 		var beamLine 	= g.line(beamStart, beamEnd);
-		plotLine(beamLine,"#ff0000");
+		canvas.drawLine(beamLine.start.x, beamLine.start.y, beamLine.end.x, beamLine.end.y ,"#ff0000");
 
 		
-		var lTop 	= g.line(  g.point( 0, 0), 			g.point(width,0)		);
-		var lRight 	= g.line(  g.point( width, 0), 		g.point(width,height)	);
-		var lBottom = g.line(  g.point( width, height), g.point(0,height)		);
-		var lLeft 	= g.line(  g.point( 0, height), 	g.point(0,0)			);
+		for (var m = 0; m < walls.length; m ++ ) {
 		
-		plotLine(lTop,"#0000ff");
-		plotLine(lRight,"#00ff00");
-		plotLine(lBottom,"#666666");
-		plotLine(lLeft,"#996600");
-		
-		var lTopDist 	= lTop.intersection( beamLine );
-		var lRightDist 	= lRight.intersection( beamLine);
-		var lBottomDist = lBottom.intersection( beamLine);
-		var lLeftDist 	= lLeft.intersection( beamLine );
-		
-				
-		//console.log('intersection=', lTopDist		);
-		//console.log('intersection=', lRightDist 	);
-		//console.log('intersection=', lBottomDist 	);
-		//console.log('intersection=', lLeftDist 	);
-		
-		if ( lTopDist ) {
-			
-			if (canvas) canvas.drawSquare( lTopDist.x, lTopDist.y, 8, "green" );
-			distance = beamStart.distance( lTopDist );
-		}
-		else if ( lRightDist ) {
-			
-			if (canvas) canvas.drawSquare( lRightDist.x, lRightDist.y, 8, "green" );
-			distance = beamStart.distance( lRightDist );
-		}
-		else if ( lBottomDist ) {
-			
-			if (canvas) canvas.drawSquare( lBottomDist.x, lBottomDist.y, 8, "green" );
-			distance = beamStart.distance( lBottomDist );
-		}
-		else if ( lLeftDist ) {
-			
-			if (canvas) canvas.drawSquare( lLeftDist.x, lLeftDist.y, 8, "green" );
-			distance = beamStart.distance( lLeftDist );
-		}
+/*
+    		var lTop 	= g.line(  g.point( 0, 0), 			g.point(width,0)		);
+    		var lRight 	= g.line(  g.point( width, 0), 		g.point(width,height)	);
+    		var lBottom = g.line(  g.point( width, height), g.point(0,height)		);
+    		var lLeft 	= g.line(  g.point( 0, height), 	g.point(0,0)			);
+*/
 
+    		
+    		var wallDist 	= walls[m].intersection( beamLine );
+/*
+    		var lRightDist 	= lRight.intersection( beamLine);
+    		var lBottomDist = lBottom.intersection( beamLine);
+    		var lLeftDist 	= lLeft.intersection( beamLine );
+*/
+    		
+    				
+    		//console.log('intersection=', lTopDist		);
+    		//console.log('intersection=', lRightDist 	);
+    		//console.log('intersection=', lBottomDist 	);
+    		//console.log('intersection=', lLeftDist 	);
+    		
+    		if ( wallDist ) {
+    			
+    			if (canvas) canvas.drawSquare( wallDist.x, wallDist.y, 8, "green" );
+    			distance = beamStart.distance( wallDist );
+    		}
+/*
+    		else if ( lRightDist ) {
+    			
+    			if (canvas) canvas.drawSquare( lRightDist.x, lRightDist.y, 8, "green" );
+    			distance = beamStart.distance( lRightDist );
+    		}
+    		else if ( lBottomDist ) {
+    			
+    			if (canvas) canvas.drawSquare( lBottomDist.x, lBottomDist.y, 8, "green" );
+    			distance = beamStart.distance( lBottomDist );
+    		}
+    		else if ( lLeftDist ) {
+    			
+    			if (canvas) canvas.drawSquare( lLeftDist.x, lLeftDist.y, 8, "green" );
+    			distance = beamStart.distance( lLeftDist );
+    		}
+*/
+        }
 		console.log('distance=' + distance 	);
 
 		return distance;
 		
 	}
-    this.calcBeamDestination = function(x,y,deg) {
+    this.calcBeamDestination = function(x, y, deg) {
 		
 			var x10 = x
 			var y10 = y
@@ -175,4 +192,5 @@ function Room(id,width,height,canvas) {
 			return dim;
 	}	
 	
+	init();
 }

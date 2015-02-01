@@ -36,10 +36,12 @@ int main()                                    // main function
 }
 
 */
+
+
 var canvas		= new Canvas("roomCanvas",400, 400);
 
 var room  		= new Room("room", 400, 400,canvas);
-var gridPaper  	= new GridPaper(room);
+var gridPaper  	= new GridPaper(400,400);
 var robot 		= new Robot("robot",room);
 robot.setPosition(200,200);
 robot.setSize(25, 50);

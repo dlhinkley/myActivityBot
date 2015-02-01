@@ -17,7 +17,7 @@ function MapRoom(robot) {
 	*/
 	self.scanInitial = function() {
 		
-		var wallDist = null;
+		var point, wallDist = null;
 
 		if ( turnDeg <= 360 ) {
 			
@@ -28,10 +28,17 @@ function MapRoom(robot) {
 			wallDist = robot.getWallDistance();
 			console.log('wallDist = ' + wallDist);	
 			
-			var point = calcPoint(robot.getPoint().x ,robot.getPoint().y, wallDist, turnDeg);
+			if ( wallDist !== null ) {
+                point = calcPoint(robot.getPoint().x ,robot.getPoint().y, wallDist, turnDeg);
+    			
+    			// Save wall location
+    			walls.addLine( point );
+			}
+			else {
+    			
+    			walls.addGap();
+			}
 			
-			// Save wall location
-			walls.addLine( point );
 		}
 		else {
 			
@@ -160,13 +167,33 @@ function MapRoom(robot) {
 
 	
         var mapCell = new MapCell( x, y, gridSize ); // Create mapCell object
+        var lowerLeftPoint  = g.point( x - (gridSize/2), y + (gridSize/2) );
+        var lowerRightPoint = g.point( x + (gridSize/2), y + (gridSize/2) );
+        var upperLeftPoint  = g.point( x - (gridSize/2), y - (gridSize/2) );
+        var upperRightPoint = g.point( x + (gridSize/2), y - (gridSize/2) );
+        
+        var upperLine = g.line( upperLeftPoint, upperRightPoint );
+        var leftLine  = g.line( upperLeftPoint, lowerLeftPoint  );
+        var lowerLine = g.line( lowerLeftPoint, lowerRightPoint );
+        var rightLine = g.line( upperRightPoint,lowerRightPoint );
+        
+        var box = [upperLine, leftLine, lowerLine, rightLine ];
         
         mapGrid.addCell( mapCell );
     	    	
         // Change color touching at south
 
-        if ( ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2)) || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2)) ) {
-            mapCell.flagAsWall(); // Flag it as a wall cell
+        // If the cell goes beyond the room
+        if ( ! walls.containsPoint(lowerLeftPoint) || ! walls.containsPoint(lowerRightPoint) ) {
+        
+            // If the square intesects with a wall, it's a wall
+            if ( walls.intersects(box)  ) {
+                mapCell.flagAsWall(); // Flag it as a wall cell
+            }
+            else {
+                
+                mapCell.flagAsDoorway();
+            }
         }
         else if ( mapGrid.get( x, y + gridSize )  ) {
         
@@ -179,9 +206,16 @@ function MapRoom(robot) {
         
         
         // Change color touching at north
-        if ( ! walls.containsPoint(x - (gridSize/2), y - (gridSize/2)) || ! walls.containsPoint(x + (gridSize/2), y - (gridSize/2)) ) {
+        if ( ! walls.containsPoint(upperLeftPoint) || ! walls.containsPoint(upperRightPoint) ) {
             
-            mapCell.flagAsWall(); // Flag it as a wall cell
+            // If the square intesects with a wall, it's a wall
+            if ( walls.intersects(box)  ) {
+                mapCell.flagAsWall(); // Flag it as a wall cell
+            }
+            else {
+                
+                mapCell.flagAsDoorway();
+            }
         }
         else if ( mapGrid.get( x, y - gridSize )  ) {
         
@@ -195,9 +229,16 @@ function MapRoom(robot) {
 
         
         // Change color touching at east
-        if ( ! walls.containsPoint(x + (gridSize/2), y - (gridSize/2)) || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2)) ) {
+        if ( ! walls.containsPoint(upperRightPoint) || ! walls.containsPoint(lowerRightPoint) ) {
             
-            mapCell.flagAsWall(); // Flag it as a wall cell
+            // If the square intesects with a wall, it's a wall
+            if ( walls.intersects(box)  ) {
+                mapCell.flagAsWall(); // Flag it as a wall cell
+            }
+            else {
+                
+                mapCell.flagAsDoorway();
+            }
         }
         else if ( mapGrid.get( x + gridSize, y ) ) {
         
@@ -211,9 +252,15 @@ function MapRoom(robot) {
 
         
         // Change color touching at west
-        if ( ! walls.containsPoint(x - (gridSize/2), y - (gridSize/2)) || ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2)) ) {
+        if ( ! walls.containsPoint(upperLeftPoint) || ! walls.containsPoint(lowerLeftPoint) ) {
             
-            mapCell.flagAsWall(); // Flag it as a wall cell
+            if ( walls.intersects(box)  ) {
+                mapCell.flagAsWall(); // Flag it as a wall cell
+            }
+            else {
+                
+                mapCell.flagAsDoorway();
+            }
         }
         else if ( mapGrid.get( x - gridSize, y ) ) {
         
@@ -283,6 +330,7 @@ function MapRoom(robot) {
     	console.log('MapCell start x=' + x + ' y=' + y);
 
         var isWall = false;
+        var isDoorway = false;
         
         this.x = x;
         this.y = y;
@@ -295,16 +343,33 @@ function MapRoom(robot) {
         canvas.drawBox(x, y, gridSize, '#00FF00');
         
         /**
-        * Flag as wall
+        * Flag as Doorway
         */
+        this.flagAsDoorway = function() {
+                      
+            clearFlags();           
+            isDoorway = true;
+            canvas.drawSquare(this.x, this.y, gridSize, '#999999');
+        };
+        this.isDoorway = function() {
+            
+            return isDoorway;
+        }
+        
         this.flagAsWall = function() {
-                        
+                      
+            clearFlags();           
             isWall = true;
             canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
         };
         this.isWall = function() {
             
             return isWall;
+        }
+        function clearFlags() {
+            
+            isWall = false;
+            isDoorway = false;
         }
         this.flagAsPath = function() {
             
@@ -334,36 +399,18 @@ function Walls(canvas) {
 		else {
 			
 			lineArray.push( g.line(prevPoint, point) );
-			prevPoint = point;
-			
-			combineLastTwo();
+			prevPoint = point;			
 		}
 	}
 	/**
-	* Check the last two entries, if they in a a strait line, combine into one
-	* This reduces the number of points
+	* Called if there's a gap in the wall (ex. doorway).  Set's the prev point to 
+	* null so the lines are unconnected and represent the door
 	*/
-	function combineLastTwo() {
-		
-		if ( lineArray.length > 1 ) {
-		
-			var last 	 = lineArray[ lineArray.length - 1 ];
-			var previous = lineArray[ lineArray.length - 2 ];
-			
-			// If the starting point of the last line, and the ending point of the previous
-			// are the same, combine into one line
-			//
-			
-			if ( last.start.x === previous.end.x && last.start.y === previous.end.y && collinear( previous.start.x, previous.start.y, previous.end.x, previous.end.y, last.end.x, last.end.y) ) {
-				
-				
-				previous.end.x = last.end.x;
-				previous.end.y = last.end.y;
-				
-				lineArray.pop();
-			}
-		}
-	}
+    this.addGap = function() {
+        
+        prevPoint = null;
+    }
+
 	/**
 	* Removes the previous point.  Done since lines needed to be added in sets of points
 	* instead of one point
@@ -401,7 +448,7 @@ function Walls(canvas) {
 	/**
 	* Given the location of a point, return true if point is inside the walls
 	*/
-	this.containsPoint = function(x,y) {
+	this.containsPoint = function(point) {
     	
     	var pointArray = [];
     	
@@ -413,7 +460,32 @@ function Walls(canvas) {
 		    pointArray.push( lineArray[m].end.y );
 		    
 		}
-    	return PolyK.ContainsPoint( pointArray, x, y );
+    	return PolyK.ContainsPoint( pointArray, point.x, point.y );
+	}
+	/**
+	* Given an array of lines that make a box, returns true if that line 
+	* intersects with a wall
+	*/
+	this.intersects = function( box ) {
+    	
+    	var ptr = 0;
+    	var intersects = false;
+    	
+		while ( ! intersects && ptr < lineArray.length ) {
+		
+		    for (var m = 0; m < box.length; m ++ ) {
+		
+                var line = box[m];
+                
+    		    if ( line.intersection( lineArray[ptr] ) !== null ) {
+        		    
+        		    intersects = true;
+    		    }
+		    }
+    	
+            ptr++;
+    	}
+    	return intersects;
 	}
 
 }
