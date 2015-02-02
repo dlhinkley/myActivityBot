@@ -11,7 +11,12 @@ function Room(id,width,height,canvas) {
         		g.line(  g.point( width - width/3, 0), g.point(width,0)		), // Top wall right of door
             	g.line(  g.point( width, 0),            g.point(width,height)	), // Left wall
         		g.line(  g.point( width, height),       g.point(0,height)		), // right wall
-        		g.line(  g.point( 0, height),           g.point(0,0)			)  // bottom wall
+        		g.line(  g.point( 0, height),           g.point(0,0)			),  // bottom wall
+        		
+        		g.line(  g.point( 80, 80),           g.point(100, 80)			),  // box inside room top
+        		g.line(  g.point( 100, 80),           g.point(100, 100)			),  // box inside room left
+        		g.line(  g.point( 100, 100),           g.point(80, 100)			),  // box inside room bottom
+        		g.line(  g.point( 80, 100),           g.point(80, 80)			),  // box inside room right
         ];	  
         
         wallCanvas		= new Canvas("roomWallCanvas",width, height);
