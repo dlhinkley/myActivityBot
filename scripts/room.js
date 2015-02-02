@@ -18,8 +18,9 @@ function Room(id,width,height,canvas) {
         		g.line(  g.point( 100, 100),           g.point(80, 100)			),  // box inside room bottom
         		g.line(  g.point( 80, 100),           g.point(80, 80)			),  // box inside room right
         ];	  
+        var maxDim = getMaxDim(walls);
         
-        wallCanvas		= new Canvas("roomWallCanvas",width, height);
+        wallCanvas		= new Canvas("roomWallCanvas",maxDim.x, maxDim.y);
         
         drawWalls();
              
@@ -106,6 +107,23 @@ function Room(id,width,height,canvas) {
 		return distance;
 		
 	}
+	/**
+	 * Given an array of wall lines, return an object containing the max x and y
+	 * coordinates
+	 */
+	function getMaxDim(walls) {
+		
+		var maxDim = {'x': 0, 'y': 0};
+		
+		for (var m = 0; m < walls.length; m ++ ) {
+    		
+    		if ( walls[m].start.x > maxDim.x ) maxDim.x = walls[m].start.x;
+    		if ( walls[m].start.y > maxDim.y ) maxDim.y = walls[m].start.y;
+    		if ( walls[m].end.x   > maxDim.x ) maxDim.x = walls[m].end.x;
+    		if ( walls[m].end.y   > maxDim.y ) maxDim.y = walls[m].end.y;
+		}
+		return maxDim;
+	}
     this.calcBeamDestination = function(x, y, deg) {
 		
 			var x10 = x
@@ -115,32 +133,28 @@ function Room(id,width,height,canvas) {
 			// corners
 			var robotVector = Vector.create([x,y]);
 			
-			var topLeftDist  = robotVector.distanceFrom(  Vector.create([ 0, 0]) );
-			var topRightDist = robotVector.distanceFrom( Vector.create([ 0, width]) );
-			var botRightDist = robotVector.distanceFrom( Vector.create([ height, 0]) );
-			var botLeftDist  = robotVector.distanceFrom( Vector.create([ height, width]) );
-			
 			var maxDistance = 0;
 			
-            if ( topLeftDist > maxDistance ) {
-                
-                maxDistance = topLeftDist;
-            }			
-            else if ( topRightDist > maxDistance ) {
-                
-                maxDistance = topRightDist;
-            }			
-            else if ( botRightDist > maxDistance ) {
-                
-                maxDistance = botRightDist;
-            }			
-            else if ( botLeftDist > maxDistance ) {
-                
-                maxDistance = botLeftDist;
-            }			
+            // Loop through all walls and find the max distance from the robot
+            //
+			for (var m = 0; m < walls.length; m ++ ) {
+
+				var wallStartDist  = robotVector.distanceFrom(  Vector.create([ walls[m].start.x, walls[m].start.y]) );
+				var wallEndDist = robotVector.distanceFrom( Vector.create([  walls[m].end.x, walls[m].end.y]) );			
+
+			
+	            if ( wallStartDist > maxDistance ) {
+	                
+	                maxDistance = wallStartDist;
+	            }			
+	            else if ( wallEndDist > maxDistance ) {
+	                
+	                maxDistance = wallEndDist;
+	            }			
+			}
+			
             var distance = maxDistance + 20; // Add 20 to make sure goes beyond wall
-
-
+            
 			var halfHeight = distance * 2;
 			var halfWidth  = 0
 			
