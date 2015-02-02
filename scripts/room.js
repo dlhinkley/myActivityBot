@@ -68,7 +68,7 @@ function Room(id,width,height,canvas) {
 	}
 
 	/**
-	* Given a x, y coordinate and degree, returns the distance to the wall
+	* Given a x, y coordinate and degree, returns the distance to the an obstacal
 	* degree is based on 0 being up;
 	*/
 	this.getWallDistance = function(x,y,deg) {
@@ -90,51 +90,17 @@ function Room(id,width,height,canvas) {
 
 		
 		for (var m = 0; m < walls.length; m ++ ) {
-		
-/*
-    		var lTop 	= g.line(  g.point( 0, 0), 			g.point(width,0)		);
-    		var lRight 	= g.line(  g.point( width, 0), 		g.point(width,height)	);
-    		var lBottom = g.line(  g.point( width, height), g.point(0,height)		);
-    		var lLeft 	= g.line(  g.point( 0, height), 	g.point(0,0)			);
-*/
-
     		
     		var wallDist 	= walls[m].intersection( beamLine );
-/*
-    		var lRightDist 	= lRight.intersection( beamLine);
-    		var lBottomDist = lBottom.intersection( beamLine);
-    		var lLeftDist 	= lLeft.intersection( beamLine );
-*/
-    		
-    				
-    		//console.log('intersection=', lTopDist		);
-    		//console.log('intersection=', lRightDist 	);
-    		//console.log('intersection=', lBottomDist 	);
-    		//console.log('intersection=', lLeftDist 	);
-    		
+
     		if ( wallDist ) {
     			
     			if (canvas) canvas.drawSquare( wallDist.x, wallDist.y, 8, "green" );
+    			
     			distance = beamStart.distance( wallDist );
     		}
-/*
-    		else if ( lRightDist ) {
-    			
-    			if (canvas) canvas.drawSquare( lRightDist.x, lRightDist.y, 8, "green" );
-    			distance = beamStart.distance( lRightDist );
-    		}
-    		else if ( lBottomDist ) {
-    			
-    			if (canvas) canvas.drawSquare( lBottomDist.x, lBottomDist.y, 8, "green" );
-    			distance = beamStart.distance( lBottomDist );
-    		}
-    		else if ( lLeftDist ) {
-    			
-    			if (canvas) canvas.drawSquare( lLeftDist.x, lLeftDist.y, 8, "green" );
-    			distance = beamStart.distance( lLeftDist );
-    		}
-*/
-        }
+
+    }
 		console.log('distance=' + distance 	);
 
 		return distance;
