@@ -1,6 +1,6 @@
 function Room(id,width,height,canvas) {
 
-    var walls, wallCanvas;
+    var walls, wallCanvas, roomDim;
    
     function init() {
     
@@ -18,9 +18,9 @@ function Room(id,width,height,canvas) {
         		g.line(  g.point( 100, 100),           g.point(80, 100)			),  // box inside room bottom
         		g.line(  g.point( 80, 100),           g.point(80, 80)			),  // box inside room right
         ];	  
-        var maxDim = getMaxDim(walls);
+        roomDim = getRoomDim(walls);
         
-        wallCanvas		= new Canvas("roomWallCanvas",maxDim.x, maxDim.y);
+        wallCanvas		= new Canvas("roomWallCanvas",roomDim.width, roomDim.height);
         
         drawWalls();
              
@@ -111,18 +111,38 @@ function Room(id,width,height,canvas) {
 	 * Given an array of wall lines, return an object containing the max x and y
 	 * coordinates
 	 */
-	function getMaxDim(walls) {
+	function getRoomDim(walls) {
 		
-		var maxDim = {'x': 0, 'y': 0};
+		var roomDim = {
+						'width': 0,
+						'height': 0,
+						'min': {
+								'x': 0,
+								'y': 0
+						},
+						'max': {
+								'x': 0,
+								'y': 0
+						}
+		};
 		
 		for (var m = 0; m < walls.length; m ++ ) {
     		
-    		if ( walls[m].start.x > maxDim.x ) maxDim.x = walls[m].start.x;
-    		if ( walls[m].start.y > maxDim.y ) maxDim.y = walls[m].start.y;
-    		if ( walls[m].end.x   > maxDim.x ) maxDim.x = walls[m].end.x;
-    		if ( walls[m].end.y   > maxDim.y ) maxDim.y = walls[m].end.y;
+    		if ( walls[m].start.x > roomDim.max.x ) roomDim.max.x = walls[m].start.x;
+    		if ( walls[m].start.y > roomDim.max.y ) roomDim.max.y = walls[m].start.y;
+    		if ( walls[m].end.x   > roomDim.max.x ) roomDim.max.x = walls[m].end.x;
+    		if ( walls[m].end.y   > roomDim.max.y ) roomDim.max.y = walls[m].end.y;
+    		
+    		if ( walls[m].start.x > roomDim.min.x ) roomDim.min.x = walls[m].start.x;
+    		if ( walls[m].start.y > roomDim.min.y ) roomDim.min.y = walls[m].start.y;
+    		if ( walls[m].end.x   > roomDim.min.x ) roomDim.min.x = walls[m].end.x;
+    		if ( walls[m].end.y   > roomDim.min.y ) roomDim.min.y = walls[m].end.y;
+    		
 		}
-		return maxDim;
+		roomDim.width  = roomDim.max.x - roomDim.min.x;
+		roomDim.height = roomDim.max.y - roomDim.min.y;
+		
+		return roomDim;
 	}
     this.calcBeamDestination = function(x, y, deg) {
 		
