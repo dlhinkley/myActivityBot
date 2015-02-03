@@ -80,14 +80,14 @@ function Robot(id,room,x,y) {
 		
 		var newDeg = loc.heading.deg + deg;
         
-        if ( newDeg > 360 ) {
-	        	        
-        	newDeg -= 360;;
-        }
-        else if ( newDeg < 0 ) {
-	        
-	        newDeg += 360;
-        }	
+	        if ( newDeg > 360 ) {
+		        	        
+	        	newDeg -= 360;;
+	        }
+	        else if ( newDeg < 0 ) {
+		        
+		        newDeg += 360;
+	        }	
         
         
 		if ( ! isHitWall( self.x, self.y, newDeg )  ) {

@@ -20,6 +20,8 @@ function Room(id,width,height,canvas) {
         ];	  
         roomDim = getRoomDim(walls);
         
+        console.log('init roomDim=',roomDim);
+        
         wallCanvas		= new Canvas("roomWallCanvas",roomDim.width, roomDim.height);
         
         drawWalls();
@@ -87,7 +89,7 @@ function Room(id,width,height,canvas) {
 		//console.log('beamStart=',beamStart);
 		
 		var beamLine 	= g.line(beamStart, beamEnd);
-		canvas.drawLine(beamLine.start.x, beamLine.start.y, beamLine.end.x, beamLine.end.y ,"#ff0000");
+		if (canvas) canvas.drawLine(beamLine.start.x, beamLine.start.y, beamLine.end.x, beamLine.end.y ,"#ff0000");
 
 		
 		for (var m = 0; m < walls.length; m ++ ) {
@@ -133,10 +135,10 @@ function Room(id,width,height,canvas) {
     		if ( walls[m].end.x   > roomDim.max.x ) roomDim.max.x = walls[m].end.x;
     		if ( walls[m].end.y   > roomDim.max.y ) roomDim.max.y = walls[m].end.y;
     		
-    		if ( walls[m].start.x > roomDim.min.x ) roomDim.min.x = walls[m].start.x;
-    		if ( walls[m].start.y > roomDim.min.y ) roomDim.min.y = walls[m].start.y;
-    		if ( walls[m].end.x   > roomDim.min.x ) roomDim.min.x = walls[m].end.x;
-    		if ( walls[m].end.y   > roomDim.min.y ) roomDim.min.y = walls[m].end.y;
+    		if ( walls[m].start.x < roomDim.min.x ) roomDim.min.x = walls[m].start.x;
+    		if ( walls[m].start.y < roomDim.min.y ) roomDim.min.y = walls[m].start.y;
+    		if ( walls[m].end.x   < roomDim.min.x ) roomDim.min.x = walls[m].end.x;
+    		if ( walls[m].end.y   < roomDim.min.y ) roomDim.min.y = walls[m].end.y;
     		
 		}
 		roomDim.width  = roomDim.max.x - roomDim.min.x;
