@@ -85,27 +85,31 @@ function MapRoom(robot) {
 	    var myMapCell = createMapGrid();
 	    
 	    console.log('calcScanRoute myMapCell=',myMapCell);
-	    routeWest(myMapCell);
+	    routeWest(myMapCell.cellWest);
 		
 
 		return myMapCell;
 	}
     function routeWest(cell) {
         
-	    console.log('routeWest start cell=',cell);
+	    console.log('routeWest start cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
+
         if ( ! cell.isWall() ) {
             
-            cell.cellWest.flagAsPath();
+	        console.log('routeWest notWall cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
+            cell.flagAsPath();
             routeWest(cell.cellWest);
-
+        }
+        else {
+            
+	        console.log('routeWest isWall cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
         }
 	    console.log('routeWest end cell=',cell);
     }
 	function calcRoutePoint(robotCtrPoint, endPoint, distance) {
 						
 		var measureLine = g.line(robotCtrPoint, endPoint );
-
-		var routePoint = calcDistFromEndPoint(measureLine, distance);
+		var routePoint  = calcDistFromEndPoint(measureLine, distance);
 		
 		// Draw original line
 		canvas.drawLine( measureLine.end.x, measureLine.end.y, measureLine.start.x,  measureLine.start.y, 'orange' );
