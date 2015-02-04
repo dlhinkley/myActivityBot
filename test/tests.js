@@ -3,17 +3,26 @@
 
 QUnit.test( "room.isHitWall right on", function( assert ) {
 
+    var g = new Geometry();
+
     var width = 200;
     var height = 300;
-    var room = new Room(null,width, height, null);
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+];	
+
+    var room = new Room(null,walls, null);
     
     
     // Detect any hit
     var dim =  {
-                "tl": { "x": 0, "y": 0 },
-                "tr": { "x": 0, "y": 0 },
-                "bl": { "x": 0, "y": 0 },
-                "br": { "x": 0, "y": 0 },
+                "tl": { "x": 10, "y": 0 },
+                "tr": { "x": 15, "y": 0 },
+                "bl": { "x": 10, "y": 10 },
+                "br": { "x": 15, "y": 10 },
     };
     assert.ok( room.isHitWall(dim), "All Zeros");
     
@@ -26,6 +35,7 @@ QUnit.test( "room.isHitWall right on", function( assert ) {
     };
     assert.ok( ! room.isHitWall(dim), "Middle of room" );
     
+
     
     var dim =  {
                 "tl": { "x": 50, "y": 25 },
@@ -79,21 +89,29 @@ QUnit.test( "room.isHitWall right on", function( assert ) {
     
 });
 
+
 QUnit.test( "room.isHitWall past wall", function( assert ) {
 
     var width = 200;
     var height = 300;
-    var room = new Room(null,width, height, null);
+    var g = new Geometry();
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+];	
+    var room = new Room(null,walls, null);
     
     width += 50;
     height += 50;
     
     // Detect any hit
     var dim =  {
-                "tl": { "x": 0, "y": 0 },
-                "tr": { "x": 0, "y": 0 },
-                "bl": { "x": 0, "y": 0 },
-                "br": { "x": 0, "y": 0 },
+                "tl": { "x": 10, "y": 0 },
+                "tr": { "x": 15, "y": 0 },
+                "bl": { "x": 10, "y": 10 },
+                "br": { "x": 15, "y": 10 },
     };
     assert.ok( room.isHitWall(dim), "All Zeros");
     
@@ -160,12 +178,23 @@ QUnit.test( "room.isHitWall past wall", function( assert ) {
 });
 
 
+
+
+
+
 QUnit.test( "room.calcBeamDestination", function( assert ) {
 
     var width = 200;
     var height = 200;
-    var room = new Room(null,width, height, null);
-    
+    var g = new Geometry();
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+        ];	
+    var room = new Room(null,walls, null);
+     
     
     assert.equal( Math.round( room.calcBeamDestination(100,100,0).x ), 100, "Middle of room north x" );
     assert.equal( Math.round( room.calcBeamDestination(100,100,0).y ), -223, "Middle of room north y" );
@@ -188,8 +217,15 @@ QUnit.test( "room.getWallDistance", function( assert ) {
 
     var width = 200;
     var height = 200;
-    var room = new Room(null,width, height, null);
-    
+    var g = new Geometry();
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+];	
+    var room = new Room(null,walls, null);
+     
     assert.equal( Math.round( room.getWallDistance(100,100,0) ), 100, "Middle of room north" );
     assert.equal( Math.round( room.getWallDistance(100,100,360) ), 100, "Middle of room north" );
     assert.equal( Math.round( room.getWallDistance(100,100,90) ), 100, "Middle of room east" );
@@ -198,7 +234,13 @@ QUnit.test( "room.getWallDistance", function( assert ) {
     
     width = 300;
     height = 500;
-    room = new Room(null,width, height, null);
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+];	
+    var room = new Room(null,walls, null);
     
     assert.equal( Math.round( room.getWallDistance(150, 200,0) ), 200, "Middle of room north" );
     assert.equal( Math.round( room.getWallDistance(150, 200,360) ), 200, "Middle of room north" );
@@ -208,12 +250,23 @@ QUnit.test( "room.getWallDistance", function( assert ) {
     
 });
 
-/*
+
+
 
 QUnit.test( "mapRoom", function( assert ) {
 
-    var room  		= new Room(null, 400, 400,null);
-    var robot 		= new Robot(null,room);
+    var width = 400;
+    var height = 400;
+    var g = new Geometry();
+    
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+];	
+    var room    = new Room(null,walls, null);
+    var robot   = new Robot(null,room);
     var mapRoom = new MapRoom(robot,null);
     
     robot.setPosition(200,200);
@@ -227,7 +280,8 @@ QUnit.test( "mapRoom", function( assert ) {
 		
 		mapRoom.scanInitial();
 	}
-    assert.equal(mapRoom.getWalls().length() , 9, "Wall length");
+    assert.equal(mapRoom.getWalls().length() , 36, "Wall length");
+/*
     	
     assert.equal( Math.round( mapRoom.getWalls().get(0).start.x ), 231, "Wall 0 start x");
     assert.equal( Math.round( mapRoom.getWalls().get(0).start.y ), 0, "Wall 0 start y");
@@ -274,12 +328,14 @@ QUnit.test( "mapRoom", function( assert ) {
     assert.equal( Math.round( mapRoom.getWalls().get(8).end.x ), 231, "Wall 8 end x");
     assert.equal( Math.round( mapRoom.getWalls().get(8).end.y ), 0, "Wall 8 end y");
     	
-});
 */
+});
+
 
 QUnit.test( "lineAngleDeg", function( assert ) {
 
     //var canvas = new Canvas("graph",400, 400);
+
 	var g = new Geometry();
 
 
@@ -319,27 +375,58 @@ QUnit.test( "lineAngleDeg", function( assert ) {
 	var line = g.line( g.point(100, 100), g.point(95, 50));
 	assert.equal( Math.round( lineAngleDeg(line) ), 354, "line short of north angle");
 
+});
 
-	//canvas.drawLine(line.start.x, line.start.y, line.end.x, line.end.y, 'blue');
-	//canvas.drawCircle(line.end.x, line.end.y, 5, 'blue');/*
+QUnit.test( "maproom.calcScanRoute", function( assert ) {
 
 
 
+    var width = 400;
+    var height = 400;
+    var g = new Geometry();
+    
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+    ];	
+            
+    var room  		= new Room(null, walls,null);
+    var robot 		= new Robot(null,room);
+    robot.setPosition(200,200);
+    robot.setSize(25, 50);
+    
+    var mapRoom = new MapRoom(robot,null);
+    	robot.setPosition(200,200);
+    
+    var route = null;
+
+	while ( ! mapRoom.complete ) {
+		
+		mapRoom.scanInitial();
+	}
 	
-/*
-				var lineAngleDeg  = line.angle();
-			console.log('caleScanRoute lineAngleDeg=' + lineAngleDeg);
-			
-			var startPoint = line.start;
-			var newEndPoint     = g.point.fromPolar(wallBuffer, rad(lineAngleDeg), startPoint); // calculate new line end based on original angle and startpoint
-			var newLine = g.line(startPoint,newEndPoint);
-*/
+	assert.ok(mapRoom.complete  , "Room navigation complete");
+
+	var robotCell = mapRoom.calcScanRoute();
+	
+	console.log('robotCell=',robotCell);
+	
+	assert.equal( robotCell.x , 200, "Robot cell x");
+	assert.equal( robotCell.y , 200, "Robot cell y");
+	
+	assert.equal( robotCell.cellEast.x , 250, "Cell to east of robot x");
+	assert.equal( robotCell.cellEast.y , 200, "Cell to east of robot x");
+
+	assert.equal( robotCell.cellWest.x , 150, "Cell to west of robot x");
+	assert.equal( robotCell.cellWest.y , 200, "Cell to west of robot x");
+
+	assert.equal( robotCell.cellNorth.x , 200, "Cell to north of robot x");
+	assert.equal( robotCell.cellNorth.y , 150, "Cell to north of robot x");
+
+	assert.equal( robotCell.cellSouth.x , 200, "Cell to south of robot x");
+	assert.equal( robotCell.cellSouth.y , 250, "Cell to south of robot x");
+
 });
-QUnit.test( "PolyK Library", function( assert ) {
 
-    var canvas = new Canvas("graph",400, 400);
-
-    
-
-    
-});

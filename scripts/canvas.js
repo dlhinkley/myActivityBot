@@ -12,7 +12,7 @@ function Canvas(id,width,height) {
 	
 	this.clear = function() {
 		
-		context.clearRect ( 0 , 0 , canvas.width, canvas.height );
+		context.clearRect ( 0 , 0 , this.canvas.width, this.canvas.height );
 	};
 	this.drawSquare = function(x, y, size, color) {
 		

@@ -42,7 +42,6 @@ function MapRoom(robot) {
 		}
 		else {
 			
-			
 			this.complete = true;
     		canvas.clear();
     		walls.plotWalls();
@@ -89,7 +88,7 @@ function MapRoom(robot) {
 	    routeWest(myMapCell);
 		
 
-		return true;
+		return myMapCell;
 	}
     function routeWest(cell) {
         
@@ -103,21 +102,21 @@ function MapRoom(robot) {
 	    console.log('routeWest end cell=',cell);
     }
 	function calcRoutePoint(robotCtrPoint, endPoint, distance) {
-							
-			var measureLine = g.line(robotCtrPoint, endPoint );
+						
+		var measureLine = g.line(robotCtrPoint, endPoint );
 
-			var routePoint = calcDistFromEndPoint(measureLine, distance);
-			
-			// Draw original line
-			canvas.drawLine( measureLine.end.x, measureLine.end.y, measureLine.start.x,  measureLine.start.y, 'orange' );
-			canvas.drawSquare(measureLine.end.x, measureLine.end.y, 16, 'orange');
-			
-			
-			// Draw shortened line
-			canvas.drawLine( robotCtrPoint.x, robotCtrPoint.y, routePoint.x,  routePoint.y, 'blue' );
-			canvas.drawSquare(routePoint.x, routePoint.y, 8, 'blue');
-			
-			return routePoint;
+		var routePoint = calcDistFromEndPoint(measureLine, distance);
+		
+		// Draw original line
+		canvas.drawLine( measureLine.end.x, measureLine.end.y, measureLine.start.x,  measureLine.start.y, 'orange' );
+		canvas.drawSquare(measureLine.end.x, measureLine.end.y, 16, 'orange');
+		
+		
+		// Draw shortened line
+		canvas.drawLine( robotCtrPoint.x, robotCtrPoint.y, routePoint.x,  routePoint.y, 'blue' );
+		canvas.drawSquare(routePoint.x, routePoint.y, 8, 'blue');
+		
+		return routePoint;
 	}
 	/**
 	* Given a line, calculate the point on the line the given distance away
@@ -164,7 +163,6 @@ function MapRoom(robot) {
 	function createCell(x, y, direction, level) {
     	
     	console.log('createCell start direction=' + direction + ' level=' + level + ' x=' + x + ' y=' + y);
-
 	
         var mapCell = new MapCell( x, y, gridSize ); // Create mapCell object
         var lowerLeftPoint  = g.point( x - (gridSize/2), y + (gridSize/2) );
@@ -195,6 +193,7 @@ function MapRoom(robot) {
                 mapCell.flagAsDoorway();
             }
         }
+        // If the cell already exists, use it
         else if ( mapGrid.get( x, y + gridSize )  ) {
         
             mapCell.cellSouth = mapGrid.get( x, y + gridSize );
@@ -217,6 +216,7 @@ function MapRoom(robot) {
                 mapCell.flagAsDoorway();
             }
         }
+        // If the cell already exists, use it
         else if ( mapGrid.get( x, y - gridSize )  ) {
         
             mapCell.cellNorth = mapGrid.get( x, y - gridSize );
@@ -240,13 +240,14 @@ function MapRoom(robot) {
                 mapCell.flagAsDoorway();
             }
         }
+        // If the cell already exists, use it
         else if ( mapGrid.get( x + gridSize, y ) ) {
         
-            mapCell.cellWest = mapGrid.get( x + gridSize, y );
+            mapCell.cellEast = mapGrid.get( x + gridSize, y );
         }
         else {
             
-            mapCell.cellWest = createCell( x + gridSize, y , 'east', level + 1); // Create cell east
+            mapCell.cellEast = createCell( x + gridSize, y , 'east', level + 1); // Create cell east
         }
         
 
@@ -262,13 +263,14 @@ function MapRoom(robot) {
                 mapCell.flagAsDoorway();
             }
         }
+        // If the cell already exists, use it
         else if ( mapGrid.get( x - gridSize, y ) ) {
         
-            mapCell.cellEast = mapGrid.get( x - gridSize, y );
+            mapCell.cellWest = mapGrid.get( x - gridSize, y );
         }
         else {
             
-            mapCell.cellEast = createCell( x - gridSize, y , 'west', level + 1); // Create cell east
+            mapCell.cellWest = createCell( x - gridSize, y , 'west', level + 1); // Create cell east
         }
         
     	console.log('createCell end direction=' + direction + ' level=' + level + ' x=' + x + ' y=' + y);

@@ -39,8 +39,22 @@ int main()                                    // main function
 
 
 var canvas		= new Canvas("roomCanvas",400, 400);
+var g = new Geometry();
 
-var room  		= new Room("room", 400, 400,canvas);
+var walls = [
+		g.line(  g.point( 0, 0),                g.point(400/3,0)		), // Top wall left of door
+		g.line(  g.point( 400 - 400/3, 0), g.point(400,0)		), // Top wall right of door
+    	g.line(  g.point( 400, 0),            g.point(400,400)	), // Left wall
+		g.line(  g.point( 400, 400),       g.point(0,400)		), // right wall
+		g.line(  g.point( 0, 400),           g.point(0,0)			),  // bottom wall
+		
+		g.line(  g.point( 80, 80),           g.point(100, 80)			),  // box inside room top
+		g.line(  g.point( 100, 80),           g.point(100, 100)			),  // box inside room left
+		g.line(  g.point( 100, 100),           g.point(80, 100)			),  // box inside room bottom
+		g.line(  g.point( 80, 100),           g.point(80, 80)			),  // box inside room right
+];	
+        
+var room  		= new Room("room", walls,canvas);
 var gridPaper  	= new GridPaper(400,400);
 var robot 		= new Robot("robot",room);
 robot.setPosition(200,200);

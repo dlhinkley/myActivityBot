@@ -1,28 +1,15 @@
-function Room(id,width,height,canvas) {
+function Room(id,walls,canvas) {
 
     var walls, wallCanvas, roomDim;
    
     function init() {
     
 		var g = new Geometry();
-        
-        walls = [
-        		g.line(  g.point( 0, 0),                g.point(width/3,0)		), // Top wall left of door
-        		g.line(  g.point( width - width/3, 0), g.point(width,0)		), // Top wall right of door
-            	g.line(  g.point( width, 0),            g.point(width,height)	), // Left wall
-        		g.line(  g.point( width, height),       g.point(0,height)		), // right wall
-        		g.line(  g.point( 0, height),           g.point(0,0)			),  // bottom wall
-        		
-        		g.line(  g.point( 80, 80),           g.point(100, 80)			),  // box inside room top
-        		g.line(  g.point( 100, 80),           g.point(100, 100)			),  // box inside room left
-        		g.line(  g.point( 100, 100),           g.point(80, 100)			),  // box inside room bottom
-        		g.line(  g.point( 80, 100),           g.point(80, 80)			),  // box inside room right
-        ];	  
         roomDim = getRoomDim(walls);
         
-        console.log('init roomDim=',roomDim);
+        console.log('init roomDim=', roomDim);
         
-        wallCanvas		= new Canvas("roomWallCanvas",roomDim.width, roomDim.height);
+        wallCanvas		= new Canvas("roomWallCanvas", roomDim.width, roomDim.height);
         
         drawWalls();
              
@@ -37,7 +24,7 @@ function Room(id,width,height,canvas) {
 			wallCanvas.drawLine( walls[m].start.x, walls[m].start.y, walls[m].end.x,  walls[m].end.y, 'black' );
 			
 			wallCanvas.drawSquare( walls[m].start.x, walls[m].start.y, 8, 'black' );
-			wallCanvas.drawSquare( walls[m].end.x, walls[m].end.y, 8, 'black' );
+			wallCanvas.drawSquare( walls[m].end.x,   walls[m].end.y,   8, 'black' );
 		}
     }
 	/**
@@ -45,30 +32,42 @@ function Room(id,width,height,canvas) {
 	*/
 	this.isHitWall = function(dim) {
 		
-		//console.log('isHitWall dim=',dim);
+		console.log('isHitWall dim=',dim);
+		
+		var g = new Geometry();
 		
 		var hit = false;
 		
-		if ( isHit( dim.tr ) ||isHit( dim.tl ) || isHit( dim.br ) || isHit( dim.bl ) ) {
-			
-			hit = true;
-			console.log("bang!!!",dim);
-		}
+		var box = [ 
+		            g.line( g.point( dim.tr.x, dim.tr.y ), g.point( dim.tl.x, dim.tl.y ) ),
+		            g.line( g.point( dim.tl.x, dim.tl.y ), g.point( dim.bl.x, dim.bl.y ) ),
+		            g.line( g.point( dim.bl.x, dim.bl.y ), g.point( dim.br.x, dim.br.y ) ),
+		            g.line( g.point( dim.br.x, dim.br.y ), g.point( dim.tr.x, dim.tr.y ) )
+		];
+
+    	var ptr = 0;
+		console.log('isHitWall walls.length=',walls.length);
+    	
+		while ( ! hit && ptr < walls.length ) {
 		
+		    for (var m = 0; m < box.length; m ++ ) {
+		
+                var line = box[m];
+                
+                console.log('walls[ptr]=', walls[ptr]);
+                console.log('box[m]=', box[m]);
+                
+    		    if ( line.intersection( walls[ptr] ) !== null ) {
+        		    
+        		    hit = true;
+        			console.log("bang!!!",dim);
+    		    }
+		    }
+            ptr++;
+    	}
 		return hit;
 	}
-	function isHit(cornerDim) {
-		
-		var hit = false;
-		
-		if ( cornerDim.x <= 0 || cornerDim.y <= 0 || cornerDim.x >= width || cornerDim.x >= height || cornerDim.y >= width || cornerDim.y >= height ) {
-			
-			
-			hit = true;
-		}
-		return hit;
-		
-	}
+
 
 	/**
 	* Given a x, y coordinate and degree, returns the distance to the an obstacal
@@ -76,19 +75,15 @@ function Room(id,width,height,canvas) {
 	*/
 	this.getWallDistance = function(x,y,deg) {
 
-		var distance = null;
-		
-		var g = new Geometry();
-		
-		var dim = this.calcBeamDestination(x,y,deg);
+		var distance    = null;
+		var g           = new Geometry();
+		var dim         = this.calcBeamDestination(x,y,deg);
 
-		
 		var beamStart 	= g.point(x,y);
-		var beamEnd 	= g.point(dim.x, dim.y);
-		
-		//console.log('beamStart=',beamStart);
-		
+		var beamEnd 	= g.point(dim.x, dim.y);		
 		var beamLine 	= g.line(beamStart, beamEnd);
+		
+        		
 		if (canvas) canvas.drawLine(beamLine.start.x, beamLine.start.y, beamLine.end.x, beamLine.end.y ,"#ff0000");
 
 		
@@ -102,12 +97,10 @@ function Room(id,width,height,canvas) {
     			
     			distance = beamStart.distance( wallDist );
     		}
-
-    }
+        }
 		console.log('distance=' + distance 	);
 
 		return distance;
-		
 	}
 	/**
 	 * Given an array of wall lines, return an object containing the max x and y
@@ -161,8 +154,8 @@ function Room(id,width,height,canvas) {
             //
 			for (var m = 0; m < walls.length; m ++ ) {
 
-				var wallStartDist  = robotVector.distanceFrom(  Vector.create([ walls[m].start.x, walls[m].start.y]) );
-				var wallEndDist = robotVector.distanceFrom( Vector.create([  walls[m].end.x, walls[m].end.y]) );			
+				var wallStartDist  = robotVector.distanceFrom( Vector.create([ walls[m].start.x, walls[m].start.y ] ) );
+				var wallEndDist    = robotVector.distanceFrom( Vector.create([ walls[m].end.x,   walls[m].end.y   ] ) );			
 
 			
 	            if ( wallStartDist > maxDistance ) {
@@ -193,7 +186,7 @@ function Room(id,width,height,canvas) {
 			
 
 			console.log('calcBeamDestination distance=' + distance + ' dim=',dim);
-			
+			console.log('canvas=',canvas);
 			if (canvas ) canvas.drawLine( x, y, dim.x, dim.y, 'blue');
 			
 			return dim;
