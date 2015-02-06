@@ -1,3 +1,4 @@
+'use strict'
 
 function MapRoom(robot) {
 
@@ -85,26 +86,26 @@ function MapRoom(robot) {
 	    var myMapCell = createMapGrid();
 	    
 	    console.log('calcScanRoute myMapCell=',myMapCell);
-	    routeWest(myMapCell.cellWest);
-		
+	    
+	    var step = 1;
+	    var cellStep = routeWestUntilWall({'step':step, 'cell': myMapCell});
 
-		return myMapCell;
+		return cellStep.cell;
 	}
-    function routeWest(cell) {
+    function routeWestUntilWall(cellStep) {
+        var cell = cellStep.cell;
+        var step = cellStep.step;
         
-	    console.log('routeWest start cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
+	    console.log('routeWest start step=' + step + ' cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
 
         if ( ! cell.isWall() ) {
             
-	        console.log('routeWest notWall cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
-            cell.flagAsPath();
-            routeWest(cell.cellWest);
-        }
-        else {
+            cell.flagAsPath(step);
+            step++;
             
-	        console.log('routeWest isWall cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
+            step = routeWestUntilWall( {'step':step, 'cell': cell.cellWest} );
         }
-	    console.log('routeWest end cell=',cell);
+        return {'step':step, 'cell': cell};
     }
 	function calcRoutePoint(robotCtrPoint, endPoint, distance) {
 						
@@ -169,27 +170,17 @@ function MapRoom(robot) {
     	console.log('createCell start direction=' + direction + ' level=' + level + ' x=' + x + ' y=' + y);
 	
         var mapCell = new MapCell( x, y, gridSize ); // Create mapCell object
-        var lowerLeftPoint  = g.point( x - (gridSize/2), y + (gridSize/2) );
-        var lowerRightPoint = g.point( x + (gridSize/2), y + (gridSize/2) );
-        var upperLeftPoint  = g.point( x - (gridSize/2), y - (gridSize/2) );
-        var upperRightPoint = g.point( x + (gridSize/2), y - (gridSize/2) );
         
-        var upperLine = g.line( upperLeftPoint, upperRightPoint );
-        var leftLine  = g.line( upperLeftPoint, lowerLeftPoint  );
-        var lowerLine = g.line( lowerLeftPoint, lowerRightPoint );
-        var rightLine = g.line( upperRightPoint,lowerRightPoint );
-        
-        var box = [upperLine, leftLine, lowerLine, rightLine ];
-        
+
         mapGrid.addCell( mapCell );
     	    	
         // Change color touching at south
 
-        // If the cell goes beyond the room
-        if ( ! walls.containsPoint(lowerLeftPoint) || ! walls.containsPoint(lowerRightPoint) ) {
+        // If the cell corners goes beyond the room
+        if ( ! walls.containsPoint( mapCell.lowerLeftCorner ) || ! walls.containsPoint( mapCell.lowerRightCorner ) ) {
         
             // If the square intesects with a wall, it's a wall
-            if ( walls.intersects(box)  ) {
+            if ( walls.intersects(mapCell.borders)  ) {
                 mapCell.flagAsWall(); // Flag it as a wall cell
             }
             else {
@@ -209,10 +200,11 @@ function MapRoom(robot) {
         
         
         // Change color touching at north
-        if ( ! walls.containsPoint(upperLeftPoint) || ! walls.containsPoint(upperRightPoint) ) {
+        if ( ! walls.containsPoint(mapCell.upperLeftCorner) || ! walls.containsPoint(mapCell.upperRightCorner) ) {
             
             // If the square intesects with a wall, it's a wall
-            if ( walls.intersects(box)  ) {
+            if ( walls.intersects(mapCell.borders)  ) {
+            
                 mapCell.flagAsWall(); // Flag it as a wall cell
             }
             else {
@@ -233,10 +225,11 @@ function MapRoom(robot) {
 
         
         // Change color touching at east
-        if ( ! walls.containsPoint(upperRightPoint) || ! walls.containsPoint(lowerRightPoint) ) {
+        if ( ! walls.containsPoint(mapCell.upperRightCorner) || ! walls.containsPoint(mapCell.lowerRightCorner) ) {
             
             // If the square intesects with a wall, it's a wall
-            if ( walls.intersects(box)  ) {
+            if ( walls.intersects(mapCell.borders)  ) {
+            
                 mapCell.flagAsWall(); // Flag it as a wall cell
             }
             else {
@@ -257,9 +250,10 @@ function MapRoom(robot) {
 
         
         // Change color touching at west
-        if ( ! walls.containsPoint(upperLeftPoint) || ! walls.containsPoint(lowerLeftPoint) ) {
+        if ( ! walls.containsPoint(mapCell.upperLeftCorner) || ! walls.containsPoint(mapCell.lowerLeftCorner) ) {
             
-            if ( walls.intersects(box)  ) {
+            if ( walls.intersects(mapCell.borders)  ) {
+            
                 mapCell.flagAsWall(); // Flag it as a wall cell
             }
             else {
@@ -316,7 +310,7 @@ function MapRoom(robot) {
         this.get = function(x,y) {
             
             var cell = null;
-            ctr = 0;
+            var ctr = 0;
             while (cell === null && ctr < cells.length ) {
                 
                 if ( cells[ctr].x === x && cells[ctr].y === y ) {
@@ -338,6 +332,7 @@ function MapRoom(robot) {
         var isWall = false;
         var isDoorway = false;
         
+        this.pathStep = null;
         this.x = x;
         this.y = y;
         
@@ -345,6 +340,21 @@ function MapRoom(robot) {
         this.cellSouth = null;
         this.cellEast = null;
         this.cellWest = null;
+        
+                // Define the points of the cell
+        this.lowerLeftCorner  = g.point( x - (gridSize/2), y + (gridSize/2) );
+        this.lowerRightCorner = g.point( x + (gridSize/2), y + (gridSize/2) );
+        this.upperLeftCorner  = g.point( x - (gridSize/2), y - (gridSize/2) );
+        this.upperRightCorner = g.point( x + (gridSize/2), y - (gridSize/2) );
+        
+        // Get the lines of the cell
+        this.upperLine = g.line( this.upperLeftCorner, this.upperRightCorner );
+        this.leftLine  = g.line( this.upperLeftCorner, this.lowerLeftCorner  );
+        this.lowerLine = g.line( this.lowerLeftCorner, this.lowerRightCorner );
+        this.rightLine = g.line( this.upperRightCorner,this.lowerRightCorner );
+        
+        // Li
+        this.borders = [this.upperLine, this.leftLine, this.lowerLine, this.rightLine ];
         
         canvas.drawBox(x, y, gridSize, '#00FF00');
         
@@ -377,9 +387,13 @@ function MapRoom(robot) {
             isWall = false;
             isDoorway = false;
         }
-        this.flagAsPath = function() {
+        this.flagAsPath = function(step) {
             
+            this.pathStep = step;
             canvas.drawSquare(this.x, this.y, gridSize, '#0000FF');
+            canvas.writeText(this.x, this.y, step,'#FFFFFF', '30px');
+            
+            console.log('Canvas.flagAsPath this.x=' + this.x + ' this.y=' + this.y);
         };
     }
 }

@@ -18,15 +18,15 @@ function Canvas(id,width,height) {
 		
 		//console.log('drawSquare x=' + x +  '  y=' + y +  ' size=' + size + ' color=' + color);
 
-			context.fillStyle = color;
-			context.fillRect(x - (size/2), y - (size/2), size, size)
+		context.fillStyle = color;
+		context.fillRect(x - (size/2), y - (size/2), size, size)
 	}
 	this.drawBox = function(x, y, size, color) {
 		
 		//console.log('drawSquare x=' + x +  '  y=' + y +  ' size=' + size + ' color=' + color);
 
-			context.fillStyle = color;
-			context.strokeRect(x - (size/2), y - (size/2), size, size)
+		context.fillStyle = color;
+		context.strokeRect(x - (size/2), y - (size/2), size, size)
 	}
 
 	this.drawCircle = function(x,y,r,color) {
@@ -48,10 +48,14 @@ function Canvas(id,width,height) {
 		
 		this.drawCircle(x,y,4,'purple');
 	}
-	this.writeText = function(x,y,text) {
+	this.writeText = function(x,y,text,color,size) {
 		
-		context.font="10px Georgia";
-		context.fillText(Math.round(x) + "," + Math.round(y),x,y);
+		if (! color  ) color = '#000000';
+		if (! size   ) size = '12px';
+		
+		context.font = size + " Georgia";
+		context.fillStyle = color;
+		context.fillText(text, x, y);
 	}
 	this.writeCoords = function(x,y) {
 		
