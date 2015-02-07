@@ -379,8 +379,6 @@ QUnit.test( "lineAngleDeg", function( assert ) {
 
 QUnit.test( "maproom.calcScanRoute", function( assert ) {
 
-
-
     var width = 400;
     var height = 400;
     var g = new Geometry();
@@ -417,16 +415,26 @@ QUnit.test( "maproom.calcScanRoute", function( assert ) {
 	assert.equal( robotCell.y , 200, "Robot cell y");
 	
 	assert.equal( robotCell.cellEast.x , 250, "Cell to east of robot x");
-	assert.equal( robotCell.cellEast.y , 200, "Cell to east of robot x");
+	assert.equal( robotCell.cellEast.y , 200, "Cell to east of robot y");
 
 	assert.equal( robotCell.cellWest.x , 150, "Cell to west of robot x");
-	assert.equal( robotCell.cellWest.y , 200, "Cell to west of robot x");
+	assert.equal( robotCell.cellWest.y , 200, "Cell to west of robot y");
 
 	assert.equal( robotCell.cellNorth.x , 200, "Cell to north of robot x");
-	assert.equal( robotCell.cellNorth.y , 150, "Cell to north of robot x");
+	assert.equal( robotCell.cellNorth.y , 150, "Cell to north of robot y");
 
 	assert.equal( robotCell.cellSouth.x , 200, "Cell to south of robot x");
-	assert.equal( robotCell.cellSouth.y , 250, "Cell to south of robot x");
+	assert.equal( robotCell.cellSouth.y , 250, "Cell to south of robot y");
+
+
+    var wallSearch = new WallSearch(robotCell);
+    var longestWall = wallSearch.getLongestWall();
+    
+	assert.equal( longestWall.x , 200, "Longest wall x");
+	assert.equal( longestWall.y , 250, "Longest wall y");
+    
+    var getMaxLength = wallSearch.getMaxLength();
+    assert.equal( getMaxLength , 5, "Longest wall length");
 
 });
 

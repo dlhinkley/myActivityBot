@@ -278,26 +278,6 @@ function MapRoom(robot) {
         
         return mapCell;
 	}
-	/**
-	* object for searchin for wall
-	*/
-  function WallSearch(beginCell) {
-  	
-  	this.beginCell = beginCell;
-  	
-  	/**
-  	* Recusively search for longest wall and return a cell next to the wall
-  	*/
-  	function getLongestWall() {
-  		
-  		searchWall(this.beginCell);
-  	}
-  	function searchWall(cell) {
-  	
-  	  
-  		
-  	}
-  }
 
 	/**
 	* Map Grid object
@@ -312,7 +292,13 @@ function MapRoom(robot) {
             
             cells.push( mapCell );
         }
-        
+        this.clearAllPathStep = function() {
+            
+            for (var m = 0; m < cells.length; m++ ) {
+                
+                cells[m].pathStep = 0;
+            }
+        }
         
         this.get = function(x,y) {
             
@@ -514,5 +500,148 @@ function Walls(canvas) {
     	}
     	return intersects;
 	}
+}
+/**
+* object for searchin for wall
+*/
+function WallSearch(beginCell) {
+  
+  var maxLength = 0;
+  var longWallCell = null;
+  this.beginCell = beginCell;
+  
+  /**
+  * Recusively search for longest wall and return a cell next to the wall
+  */
+  this.getLongestWall = function() {
+  	
+      maxLength = 0;
+      longWallCell = null;
+      
+  	searchWall(this.beginCell);
+  	
+  	return longWallCell;
+  }
+  this.getMaxLength = function() {
+      
+      return maxLength;
+  }
+  /**
+   * Recursivly search for wall
+   */
+  function searchWall(cell) {
+  
+      var length = 0;
+      
+      if ( cell.cellWest.isWall() ) {
+          
+          checkWallLength( cell.cellNorth );
+      }
+      else {
+          
+          searchWall(cell.cellWest);
+      }
+      
+      if ( cell.cellEast.isWall() ) {
+          
+          checkWallLength( cell.cellNorth );
+      }
+      else {
+          
+          searchWall(cell.cellEast);
+      }
+      
+      if ( cell.cellSouth.isWall() ) {
+          
+          checkWallLength( cell.cellNorth );
+      }
+      else {
+          
+          searchWall(cell.cellSouth);
+      }
+      
+      if ( cell.cellNorth.isWall() ) {
+          
+          checkWallLength( cell.cellNorth );
+      }
+      else {
+          
+          searchWall(cell.cellNorth);
+      }
+      
+  }
+  /**
+   * Given a cell that is a wall, return how many cell long it is
+   */
+  function checkWallLength(cell) {
+      
+      var length = 1;
+      
+      // It's a North South Wall
+      if ( cell.cellNorth.isWall() && cell.cellSouth.isWall() ) {
+          
+          length += getNorthLength(cell.cellNorth);
+          length += getSouthLength(cell.cellSouth);
+          
+          if ( length > maxLength ) {
+              
+              maxLength = length;
+              longWallCell = cell;
+          }
+      }
+      // It's a East West Wall
+      if ( cell.cellEast.isWall() && cell.cellWest.isWall() ) {
+          
+          length += getEastLength(cell.cellEast);
+          length += getWestLength(cell.cellWest);
+          
+          if ( length > maxLength ) {
+              
+              maxLength = length;
+              longWallCell = cell;
+          }
+      }
+  }
+  function getNorthLength(cell) {
+       
+      var length = 1;
+      
+      if ( cell.cellNorth.isWall() ) {
+          
+          length += getNorthLength(cell.cellNorth);
+      }
+      return length;
+  }
+  function getSouthLength(cell) {
+       
+      var length = 1;
+      
+      if ( cell.cellSouth.isWall() ) {
+          
+          length += getSouthLength(cell.cellSouth);
+      }
+      return length;
+  }
+  function getEastLength(cell) {
+       
+      var length = 1;
+      
+      if ( cell.cellEast.isWall() ) {
+          
+          length += getEastLength(cell.cellEast);
+      }
+      return length;
+  }
+  function getWestLength(cell) {
+       
+      var length = 1;
+      
+      if ( cell.cellWest.isWall() ) {
+          
+          length += getWestLength(cell.cellWest);
+      }
+      return length;
+  }
+
 
 }
