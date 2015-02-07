@@ -161,10 +161,13 @@ function MapRoom(robot) {
         mapGrid = new MapGrid();
     	
     	
-    	// Go north to wall until touching wall
+    	// recursively create cells for whole room
     	//
         return createCell(centerX, centerY, 'main',0);
 	}
+	/**
+	* recursively create cells for whole room
+	*/
 	function createCell(x, y, direction, level) {
     	
     	console.log('createCell start direction=' + direction + ' level=' + level + ' x=' + x + ' y=' + y);
@@ -275,23 +278,27 @@ function MapRoom(robot) {
         
         return mapCell;
 	}
-
 	/**
-	* Given the robot's x, y position, fill all the boxes north until hitting the wall
-	* when the wall is hit, mark that box as containing the wall
+	* object for searchin for wall
 	*/
-/*
+  function WallSearch(beginCell) {
+  	
+  	this.beginCell = beginCell;
+  	
+  	/**
+  	* Recusively search for longest wall and return a cell next to the wall
+  	*/
+  	function getLongestWall() {
+  		
+  		searchWall(this.beginCell);
+  	}
+  	function searchWall(cell) {
+  	
+  	  
+  		
+  	}
+  }
 
-	function squareTouchesWall(x, y) {
-    	
-    	
-    	return ! walls.containsPoint(x - (gridSize/2), y - (gridSize/2))
-    	    || ! walls.containsPoint(x + (gridSize/2), y - (gridSize/2))
-    	    || ! walls.containsPoint(x - (gridSize/2), y + (gridSize/2))
-    	    || ! walls.containsPoint(x + (gridSize/2), y + (gridSize/2))
-	}
-*/
-	
 	/**
 	* Map Grid object
 	*/
@@ -376,7 +383,7 @@ function MapRoom(robot) {
                       
             clearFlags();           
             isWall = true;
-            canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
+          canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
         };
         this.isWall = function() {
             
