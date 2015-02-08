@@ -1,0 +1,14 @@
+{
+  "name": "controller",
+  "version": "0.0.1",
+  "description": "Activitybot robot controller",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluetooth-serial-port": "^1.2.1"
+  }
+}
