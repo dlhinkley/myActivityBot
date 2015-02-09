@@ -296,7 +296,7 @@ function MapRoom(robot) {
             
             for (var m = 0; m < cells.length; m++ ) {
                 
-                cells[m].pathStep = 0;
+                cells[m].pathStep = null;
             }
         }
         
@@ -333,6 +333,9 @@ function MapRoom(robot) {
         this.cellSouth = null;
         this.cellEast = null;
         this.cellWest = null;
+        
+        this.directions = ['cellNorth','cellSouth','cellWest','cellEast'];
+
         
                 // Define the points of the cell
         this.lowerLeftCorner  = g.point( x - (gridSize/2), y + (gridSize/2) );
@@ -533,41 +536,23 @@ function WallSearch(beginCell) {
   
       var length = 0;
       
-      if ( cell.cellWest.isWall() ) {
+      for (var m = 0; m < cell.directions.length; m++ ) {
           
-          checkWallLength( cell.cellNorth );
-      }
-      else {
+          var direction = cell.directions[m];
+          var dirCell = cell[ direction ];
           
-          searchWall(cell.cellWest);
+          if ( dirCell.isWall() ) {
+              
+              checkWallLength( dirCell );
+          }
+          else if ( dirCell.pathStep === null ) {
+              
+              searchWall( dirCell );
+              dirCell.pathStep = 1;
+          }
       }
-      
-      if ( cell.cellEast.isWall() ) {
-          
-          checkWallLength( cell.cellNorth );
-      }
-      else {
-          
-          searchWall(cell.cellEast);
-      }
-      
-      if ( cell.cellSouth.isWall() ) {
-          
-          checkWallLength( cell.cellNorth );
-      }
-      else {
-          
-          searchWall(cell.cellSouth);
-      }
-      
-      if ( cell.cellNorth.isWall() ) {
-          
-          checkWallLength( cell.cellNorth );
-      }
-      else {
-          
-          searchWall(cell.cellNorth);
-      }
+
+ 
       
   }
   /**
