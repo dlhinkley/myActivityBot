@@ -534,6 +534,8 @@ function WallSearch(beginCell) {
    */
   function searchWall(cell) {
   
+      console.log('WallSearch.searchWall start cell=',cell);
+      
       var length = 0;
       
       for (var m = 0; m < cell.directions.length; m++ ) {
@@ -541,29 +543,29 @@ function WallSearch(beginCell) {
           var direction = cell.directions[m];
           var dirCell = cell[ direction ];
           
+           console.log('WallSearch.searchWall direction=' + direction);
+          
           if ( dirCell.isWall() ) {
               
               checkWallLength( dirCell );
           }
           else if ( dirCell.pathStep === null ) {
               
-              searchWall( dirCell );
               dirCell.pathStep = 1;
+              searchWall( dirCell );
           }
       }
-
- 
-      
   }
   /**
    * Given a cell that is a wall, return how many cell long it is
    */
   function checkWallLength(cell) {
       
+      console.log('WallSearch.searchWall start cell=' , cell);
       var length = 1;
       
       // It's a North South Wall
-      if ( cell.cellNorth.isWall() && cell.cellSouth.isWall() ) {
+      if ( cell.cellNorth && cell.cellNorth.isWall() && cell.cellSouth && cell.cellSouth.isWall() ) {
           
           length += getNorthLength(cell.cellNorth);
           length += getSouthLength(cell.cellSouth);
@@ -575,7 +577,7 @@ function WallSearch(beginCell) {
           }
       }
       // It's a East West Wall
-      if ( cell.cellEast.isWall() && cell.cellWest.isWall() ) {
+      if ( cell.cellEast && cell.cellEast.isWall() && cell.cellWest && cell.cellWest.isWall() ) {
           
           length += getEastLength(cell.cellEast);
           length += getWestLength(cell.cellWest);
