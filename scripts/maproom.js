@@ -574,7 +574,7 @@ function WallSearch(beginCell, mapGrid) {
   }
   function checkCell(cell) {
       
-      if ( cell ) {
+      if ( ! cell ) {
           
       }
       else if ( cell.isWall() ) {
