@@ -89,25 +89,23 @@ function MapRoom(robot, canvas) {
 	    
 	    console.log('calcScanRoute');
 	    
-	    var step = 1;
-	    var cellStep = routeWestUntilWall({'step':step, 'cell': rootCell});
+	    var longestWall = getLongestWall(rootCell);
 
-		return cellStep.cell;
+
+		//return cellStep.cell;
 	}
-    function routeWestUntilWall(cellStep) {
-        var cell = cellStep.cell;
-        var step = cellStep.step;
+	/**
+	 * Given the root cell to start at, search the room for the longest wall
+	 * @param MapCell
+	 * @returns Point
+	 */
+    function getLongestWall(rootCell) {
         
-	    console.log('routeWest start step=' + step + ' cell.x=' + cell.x + ' cell.y=' + cell.y + ' cell.isWall()=' + cell.isWall() );
-
-        if ( ! cell.isWall() ) {
-            
-            cell.flagAsPath(step);
-            step++;
-            
-            step = routeWestUntilWall( {'step':step, 'cell': mapGrid.cellWest(cell)} );
-        }
-        return {'step':step, 'cell': cell};
+        var wallSearch = new WallSearch(robotCell, mapGrid);
+        var longestWall = wallSearch.getLongestWall();
+        
+        return longestWall;
+    
     }
 	function calcRoutePoint(robotCtrPoint, endPoint, distance) {
 						
@@ -530,6 +528,11 @@ function Walls(canvas) {
     	return intersects;
 	}
 }
+
+function FindRoute(beginCell, endCell, mapGrid) {
+    
+    
+}
 /**
 * object for searchin for wall
 */
@@ -558,6 +561,7 @@ function WallSearch(beginCell, mapGrid) {
       
       return maxLength;
   }
+
   /**
    * Recursivly search for wall
    */

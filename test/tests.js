@@ -483,11 +483,11 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
 	
 
     var wallSearch = new WallSearch(robotCell, mapGrid);
-    var longestWall = wallSearch.getLongestWall();
+    var longestWallCell = wallSearch.getLongestWall();
 
     
-	assert.ok( longestWall.x > 0 && longestWall.x < 500, "Longest wall x");
-	assert.equal( longestWall.y , 400, "Longest wall y");
+	assert.ok( longestWallCell.x > 0 && longestWallCell.x < 500, "Longest wall x");
+	assert.equal( longestWallCell.y , 400, "Longest wall y");
     
     var getMaxLength = wallSearch.getMaxLength();
     assert.equal( getMaxLength , 9, "Longest wall length");
