@@ -1,8 +1,7 @@
 'use strict'
 
-function MapRoom(robot) {
+function MapRoom(robot, canvas) {
 
-    var canvas  = new Canvas("roomMapCanvas",400, 400);
 	var self    = this;
 	var g       = new Geometry();
 	var walls   = new Walls(canvas);
@@ -47,7 +46,7 @@ function MapRoom(robot) {
 		else {
 			
 			this.complete = true;
-    		canvas.clear();
+    		if (canvas) canvas.clear();
     		walls.plotWalls();
 		}		
 	}
@@ -196,7 +195,7 @@ function MapRoom(robot) {
         // If the cell already exists, use it
         else if ( mapGrid.get( x, y + gridSize )  ) {
         
-            //mapmapGric.cellSouth(cell) = mapGrid.get( x, y + gridSize );
+            //mapmapGrid.cellSouth(cell) = mapGrid.get( x, y + gridSize );
         }
         else {
                 
@@ -220,7 +219,7 @@ function MapRoom(robot) {
         // If the cell already exists, use it
         else if ( mapGrid.get( x, y - gridSize )  ) {
         
-            //mapmapGric.cellNorth(cell) = mapGrid.get( x, y - gridSize );
+            //mapmapGrid.cellNorth(cell) = mapGrid.get( x, y - gridSize );
         }
         else {
             
@@ -245,7 +244,7 @@ function MapRoom(robot) {
         // If the cell already exists, use it
         else if ( mapGrid.get( x + gridSize, y ) ) {
         
-            //mapmapGric.cellEast(cell) = mapGrid.get( x + gridSize, y );
+            //mapmapGrid.cellEast(cell) = mapGrid.get( x + gridSize, y );
         }
         else {
             
@@ -269,7 +268,7 @@ function MapRoom(robot) {
         // If the cell already exists, use it
         else if ( mapGrid.get( x - gridSize, y ) ) {
         
-            //mapmapGric.cellWest(cell) = mapGrid.get( x - gridSize, y );
+            //mapmapGrid.cellWest(cell) = mapGrid.get( x - gridSize, y );
         }
         else {
             
@@ -287,8 +286,8 @@ function MapRoom(robot) {
     function MapGrid( gridSizeIn ) {
         
         var gridSize = gridSizeIn;
-        var maxX  = 10;
-        var maxY  = 10;
+        var maxX  = 20;
+        var maxY  = 20;
         var cells = new Array(maxX);
         
 
@@ -342,6 +341,7 @@ function MapRoom(robot) {
         this.get = function( x, y) {
             
             console.log('MapGrid.get x=' + x + ' y=' + y + ' x/gridSize=' + x / gridSize + ' y/gridSize=' + y/gridSize );
+    
             return cells[ adjX( x ) ][ adjY( y ) ];
         }
     }
@@ -378,7 +378,7 @@ function MapRoom(robot) {
         // Li
         this.borders = [this.upperLine, this.leftLine, this.lowerLine, this.rightLine ];
         
-        canvas.drawBox(x, y, gridSize, '#00FF00');
+        if (canvas) canvas.drawBox(x, y, gridSize, '#00FF00');
         
         /**
         * Flag as Doorway
@@ -387,7 +387,7 @@ function MapRoom(robot) {
                       
             clearFlags();           
             isDoorway = true;
-            canvas.drawSquare(this.x, this.y, gridSize, '#999999');
+            if (canvas) canvas.drawSquare(this.x, this.y, gridSize, '#999999');
         };
         this.isDoorway = function() {
             
@@ -398,7 +398,7 @@ function MapRoom(robot) {
                       
             clearFlags();           
             isWall = true;
-          canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
+          if (canvas) canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
         };
         this.isWall = function() {
             
@@ -412,8 +412,8 @@ function MapRoom(robot) {
         this.flagAsPath = function(step) {
             
             this.pathStep = step;
-            canvas.drawSquare(this.x, this.y, gridSize, '#0000FF');
-            canvas.writeText(this.x, this.y, step,'#FFFFFF', '30px');
+            if (canvas) canvas.drawSquare(this.x, this.y, gridSize, '#0000FF');
+            if (canvas) canvas.writeText(this.x, this.y, step,'#FFFFFF', '30px');
             
             console.log('Canvas.flagAsPath this.x=' + this.x + ' this.y=' + this.y);
         };
@@ -533,25 +533,28 @@ function Walls(canvas) {
 /**
 * object for searchin for wall
 */
-function WallSearch(beginCell) {
+function WallSearch(beginCell, mapGrid) {
   
+  var self = this;
   var maxLength = 0;
   var longWallCell = null;
-  this.beginCell = beginCell;
+  self.beginCell = beginCell;
+  self.mapGrid = mapGrid;
+  
   
   /**
   * Recusively search for longest wall and return a cell next to the wall
   */
-  this.getLongestWall = function() {
+  self.getLongestWall = function() {
   	
       maxLength = 0;
       longWallCell = null;
       
-  	searchWall(this.beginCell);
+  	searchWall(self.beginCell);
   	
   	return longWallCell;
   }
-  this.getMaxLength = function() {
+  self.getMaxLength = function() {
       
       return maxLength;
   }
@@ -564,22 +567,24 @@ function WallSearch(beginCell) {
       
       var length = 0;
       
-      for (var m = 0; m < cell.directions.length; m++ ) {
+      checkCell( self.mapGrid.cellNorth( cell ) )
+      checkCell( self.mapGrid.cellEast(  cell ) )
+      checkCell( self.mapGrid.cellSouth( cell ) )
+      checkCell( self.mapGrid.cellWest(  cell ) )
+  }
+  function checkCell(cell) {
+      
+      if ( cell ) {
           
-          var direction = cell.directions[m];
-          var dirCell = cell[ direction ];
+      }
+      else if ( cell.isWall() ) {
           
-           console.log('WallSearch.searchWall direction=' + direction);
+          checkWallLength( cell );
+      }
+      else if ( cell.pathStep === null ) {
           
-          if ( dirCell.isWall() ) {
-              
-              checkWallLength( dirCell );
-          }
-          else if ( dirCell.pathStep === null ) {
-              
-              dirCell.pathStep = 1;
-              searchWall( dirCell );
-          }
+          cell.pathStep = 1;
+          searchWall( cell );
       }
   }
   /**
@@ -591,10 +596,10 @@ function WallSearch(beginCell) {
       var length = 1;
       
       // It's a North South Wall
-      if ( mapGric.cellNorth(cell) && mapGric.cellNorth(cell).isWall() && mapGric.cellSouth(cell) && mapGric.cellSouth(cell).isWall() ) {
+      if ( self.mapGrid.cellNorth(cell) && self.mapGrid.cellNorth(cell).isWall() && self.mapGrid.cellSouth(cell) && self.mapGrid.cellSouth(cell).isWall() ) {
           
-          length += getNorthLength(mapGric.cellNorth(cell));
-          length += getSouthLength(mapGric.cellSouth(cell));
+          length += getNorthLength( self.mapGrid.cellNorth(cell) );
+          length += getSouthLength( self.mapGrid.cellSouth(cell) );
           
           if ( length > maxLength ) {
               
@@ -603,10 +608,10 @@ function WallSearch(beginCell) {
           }
       }
       // It's a East West Wall
-      if ( mapGric.cellEast(cell) && mapGric.cellEast(cell).isWall() && mapGric.cellWest(cell) && mapGric.cellWest(cell).isWall() ) {
+      if ( self.mapGrid.cellEast(cell) && self.mapGrid.cellEast(cell).isWall() && self.mapGrid.cellWest(cell) && self.mapGrid.cellWest(cell).isWall() ) {
           
-          length += getEastLength(mapGric.cellEast(cell));
-          length += getWestLength(mapGric.cellWest(cell));
+          length += getEastLength( self.mapGrid.cellEast(cell) );
+          length += getWestLength( self.mapGrid.cellWest(cell) );
           
           if ( length > maxLength ) {
               
@@ -619,9 +624,9 @@ function WallSearch(beginCell) {
        
       var length = 1;
       
-      if ( mapGric.cellNorth(cell).isWall() ) {
+      if ( self.mapGrid.cellNorth(cell) && self.mapGrid.cellNorth(cell).isWall() ) {
           
-          length += getNorthLength(mapGric.cellNorth(cell));
+          length += getNorthLength( self.mapGrid.cellNorth(cell) );
       }
       return length;
   }
@@ -629,9 +634,9 @@ function WallSearch(beginCell) {
        
       var length = 1;
       
-      if ( mapGric.cellSouth(cell).isWall() ) {
+      if ( self.mapGrid.cellSouth(cell) && self.mapGrid.cellSouth(cell).isWall() ) {
           
-          length += getSouthLength(mapGric.cellSouth(cell));
+          length += getSouthLength( self.mapGrid.cellSouth(cell) );
       }
       return length;
   }
@@ -639,9 +644,9 @@ function WallSearch(beginCell) {
        
       var length = 1;
       
-      if ( mapGric.cellEast(cell).isWall() ) {
+      if ( self.mapGrid.cellEast(cell) && self.mapGrid.cellEast(cell).isWall() ) {
           
-          length += getEastLength(mapGric.cellEast(cell));
+          length += getEastLength( self.mapGrid.cellEast(cell) );
       }
       return length;
   }
@@ -649,9 +654,9 @@ function WallSearch(beginCell) {
        
       var length = 1;
       
-      if ( mapGric.cellWest(cell).isWall() ) {
+      if ( self.mapGrid.cellWest(cell) && self.mapGrid.cellWest(cell).isWall() ) {
           
-          length += getWestLength(mapGric.cellWest(cell));
+          length += getWestLength( self.mapGrid.cellWest(cell) );
       }
       return length;
   }
