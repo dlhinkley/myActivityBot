@@ -396,8 +396,7 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
     robot.setSize(25, 50);
     
     var mapRoom = new MapRoom(robot,null);
-    	robot.setPosition(100,100);
-    
+
     var route = null;
 
 	while ( ! mapRoom.complete ) {
@@ -444,7 +443,6 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
 	assert.equal( mapGrid.cellSouth( mapGrid.cellSouth(robotCell)).x , 100, "Cell to south south of robot x");
 	assert.equal( mapGrid.cellSouth( mapGrid.cellSouth(robotCell)).y , 200, "Cell to south south of robot y");
 	assert.ok( mapGrid.cellSouth( mapGrid.cellSouth(robotCell)).isWall() , "Cell to south south of robot wall");
-
 
 });
 

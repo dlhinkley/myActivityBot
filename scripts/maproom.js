@@ -91,8 +91,7 @@ function MapRoom(robot, canvas) {
 	    
 	    var longestWall = getLongestWall(rootCell);
 
-
-		//return cellStep.cell;
+        return rootCell;
 	}
 	/**
 	 * Given the root cell to start at, search the room for the longest wall
@@ -101,7 +100,7 @@ function MapRoom(robot, canvas) {
 	 */
     function getLongestWall(rootCell) {
         
-        var wallSearch = new WallSearch(robotCell, mapGrid);
+        var wallSearch = new WallSearch(rootCell, mapGrid);
         var longestWall = wallSearch.getLongestWall();
         
         return longestWall;
@@ -310,19 +309,42 @@ function MapRoom(robot, canvas) {
         
         this.cellWest = function(cell) {
             
-            return cells[ adjX(cell.x) - 1 ][ adjY(cell.y) ];
+            var x = adjX(cell.x) - 1;
+            var y = adjY(cell.y);
+            
+            return getCell(x, y);
         }
         this.cellEast = function(cell) {
             
-            return cells[ adjX(cell.x) + 1 ][ adjY(cell.y) ];
+            var x = adjX(cell.x) + 1;
+            var y = adjY(cell.y);
+            
+            return getCell(x, y);
         }
         this.cellSouth = function(cell) {
             
-            return cells[ adjX(cell.x)  ][ adjY(cell.y) + 1 ];
+            var x = adjX(cell.x);
+            var y = adjY(cell.y) + 1;
+            
+            return getCell(x, y);
+        }
+        function getCell(x, y) {
+            
+            var cellOut = null;
+            
+            if ( x > 0 && x < cells.length && y > 0 && y < cells[x].length ) {
+            
+                cellOut = cells[ x ][ y ];
+            }
+            return cellOut;             
+            
         }
         this.cellNorth = function(cell) {
             
-            return cells[ adjX(cell.x)  ][ adjY(cell.y) - 1 ];
+            var x = adjX(cell.x);
+            var y = adjY(cell.y) - 1;
+            
+            return getCell(x, y);
         }
         this.clearAllPathStep = function() {
             
@@ -565,38 +587,63 @@ function WallSearch(beginCell, mapGrid) {
   /**
    * Recursivly search for wall
    */
-  function searchWall(cell) {
+  function searchWall(cellIn) {
+
+    console.log('WallSearch.searchWall start cell=',cellIn);
   
-      console.log('WallSearch.searchWall start cell=',cell);
+    var queue = [];
+    queue.push(cellIn); // Initialize que
+    
       
-      var length = 0;
-      
-      checkCell( self.mapGrid.cellNorth( cell ) )
-      checkCell( self.mapGrid.cellEast(  cell ) )
-      checkCell( self.mapGrid.cellSouth( cell ) )
-      checkCell( self.mapGrid.cellWest(  cell ) )
-  }
-  function checkCell(cell) {
-      
-      if ( ! cell ) {
+    while ( queue.length > 0 ) {
+        
+        // Get current cell to check
+        var cell = queue.shift();
+        
+        console.log('WallSearch.searchWall loop cell=',cell);
+        
+        // Save the children of cell
+        var northCell = self.mapGrid.cellNorth( cell );
+        var eastCell  = self.mapGrid.cellEast(  cell );
+        var southCell = self.mapGrid.cellSouth( cell );
+        var westCell  = self.mapGrid.cellWest(  cell );   
+        
+        if ( northCell && northCell.pathStep === null && ! inQueue(queue, northCell) )  queue.push( northCell );
+        if ( eastCell  && eastCell.pathStep  === null && ! inQueue(queue, eastCell) )   queue.push( eastCell );
+        if ( southCell && southCell.pathStep === null && ! inQueue(queue, southCell) )  queue.push( southCell );
+        if ( westCell  && westCell.pathStep  === null && ! inQueue(queue, westCell) )   queue.push( westCell );
+
+        cell.pathStep = 1;
           
-      }
-      else if ( cell.isWall() ) {
+        if ( cell.isWall() ) {
           
           checkWallLength( cell );
-      }
-      else if ( cell.pathStep === null ) {
-          
-          cell.pathStep = 1;
-          searchWall( cell );
-      }
+        }
+    }
   }
+  function inQueue(queue, cell) {
+      
+      var found = false;
+      var m = 0;
+      
+      while ( ! found && m < queue.length ) {
+
+          if ( queue[m].x === cell.x && queue[m].y === cell.y ) {
+              
+              found = true;
+          }
+          
+          m++;
+      }
+      return found;
+  }
+
   /**
    * Given a cell that is a wall, return how many cell long it is
    */
   function checkWallLength(cell) {
       
-      console.log('WallSearch.searchWall start cell=' , cell);
+      console.log('WallSearch.checkWallLength start cell=' , cell);
       var length = 1;
       
       // It's a North South Wall
