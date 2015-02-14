@@ -276,169 +276,7 @@ function MapRoom(robot, canvas) {
         return mapCell;
 	}
 
-	/**
-	* Map Grid object
-	*/
-    function MapGrid( gridSizeIn ) {
-        
-        var self = this;
-        var gridSize = gridSizeIn;
-        var maxX  = 20;
-        var maxY  = 20;
-        this.cells = new Array(maxX);
-        
 
-        // Init grid
-        for (var x = 0; x < maxX; x++) {
-                
-            self.cells[x] = new Array(maxY);
-        }
-        function adjX(x) {
-            
-            return (x / gridSize);
-        }
-        function adjY(y) {
-            
-            return (y / gridSize);
-        }
-        
-        self.addCell = function( mapCell ) {
-            
-            this.cells[ adjX(mapCell.x) ][ adjY(mapCell.y) ] = mapCell;
-        }
-        
-        self.cellWest = function(cell) {
-            
-            var x = adjX(cell.x) - 1;
-            var y = adjY(cell.y);
-            
-            return getCell(x, y);
-        }
-        self.cellEast = function(cell) {
-            
-            var x = adjX(cell.x) + 1;
-            var y = adjY(cell.y);
-            
-            return getCell(x, y);
-        }
-        self.cellSouth = function(cell) {
-            
-            var x = adjX(cell.x);
-            var y = adjY(cell.y) + 1;
-            
-            return getCell(x, y);
-        }
-        function getCell(x, y) {
-            
-            console.log('MapGrid.getCell x=' + x + ' y=' + y + ' cells=',self.cells);
-            var cellOut = null;
-            
-            if ( x > 0 && x < self.cells.length && y > 0 && y < self.cells[x].length ) {
-            
-                cellOut = self.cells[ x ][ y ];
-            }
-            return cellOut;             
-            
-        }
-        self.cellNorth = function(cell) {
-            
-            var x = adjX(cell.x);
-            var y = adjY(cell.y) - 1;
-            
-            return getCell(x, y);
-        }
-        self.clearAllPathStep = function() {
-            
-            for (var x = 0; x < maxX; x++ ) {
-                
-                for (var y = 0; y < maxY; y++ ) {
-                    
-                    self.cells[x][y].pathStep = null;
-                }
-            }
-        }
-        
-        
-        self.get = function( x, y) {
-            
-            console.log('MapGrid.get x=' + x + ' y=' + y + ' x/gridSize=' + x / gridSize + ' y/gridSize=' + y/gridSize );
-    
-            return self.cells[ adjX( x ) ][ adjY( y ) ];
-        }
-    }
-    /**
-    * Map Cell object
-    */
-    function MapCell(x, y, size ) {
-        
-    	console.log('MapCell start x=' + x + ' y=' + y);
-
-        var isWall = false;
-        var isDoorway = false;
-        
-        this.pathStep = null;
-        this.x = x;
-        this.y = y;
-
-        
-        this.directions = ['cellNorth','cellSouth','cellWest','cellEast'];
-
-        
-                // Define the points of the cell
-        this.lowerLeftCorner  = g.point( x - (gridSize/2), y + (gridSize/2) );
-        this.lowerRightCorner = g.point( x + (gridSize/2), y + (gridSize/2) );
-        this.upperLeftCorner  = g.point( x - (gridSize/2), y - (gridSize/2) );
-        this.upperRightCorner = g.point( x + (gridSize/2), y - (gridSize/2) );
-        
-        // Get the lines of the cell
-        this.upperLine = g.line( this.upperLeftCorner, this.upperRightCorner );
-        this.leftLine  = g.line( this.upperLeftCorner, this.lowerLeftCorner  );
-        this.lowerLine = g.line( this.lowerLeftCorner, this.lowerRightCorner );
-        this.rightLine = g.line( this.upperRightCorner,this.lowerRightCorner );
-        
-        // Li
-        this.borders = [this.upperLine, this.leftLine, this.lowerLine, this.rightLine ];
-        
-        if (canvas) canvas.drawBox(x, y, gridSize, '#00FF00');
-        
-        /**
-        * Flag as Doorway
-        */
-        this.flagAsDoorway = function() {
-                      
-            clearFlags();           
-            isDoorway = true;
-            if (canvas) canvas.drawSquare(this.x, this.y, gridSize, '#999999');
-        };
-        this.isDoorway = function() {
-            
-            return isDoorway;
-        }
-        
-        this.flagAsWall = function() {
-                      
-            clearFlags();           
-            isWall = true;
-          if (canvas) canvas.drawSquare(this.x, this.y, gridSize, '#FF0000');
-        };
-        this.isWall = function() {
-            
-            return isWall;
-        }
-        function clearFlags() {
-            
-            isWall = false;
-            isDoorway = false;
-        }
-        this.flagAsPath = function(step) {
-            
-            this.pathStep = step;
-            if (canvas) canvas.drawSquare(this.x, this.y, gridSize, '#0000FF');
-            if (canvas) canvas.writeText(this.x, this.y, step,'#FFFFFF', '30px');
-            
-            console.log('Canvas.flagAsPath this.x=' + this.x + ' this.y=' + this.y);
-        };
-    }
 }
 
 
@@ -609,10 +447,10 @@ function WallSearch(beginCell, mapGrid, canvas) {
         var southCell = self.mapGrid.cellSouth( cell );
         var westCell  = self.mapGrid.cellWest(  cell );   
         
-        if ( northCell && northCell.pathStep === null )  queue.push( northCell );
-        if ( eastCell  && eastCell.pathStep  === null )  queue.push( eastCell );
-        if ( southCell && southCell.pathStep === null )  queue.push( southCell );
-        if ( westCell  && westCell.pathStep  === null )  queue.push( westCell );
+        if ( northCell && northCell.pathStep === null && ! inQueue(queue, northCell) )  queue.push( northCell );
+        if ( eastCell  && eastCell.pathStep  === null && ! inQueue(queue, eastCell)  )  queue.push( eastCell );
+        if ( southCell && southCell.pathStep === null && ! inQueue(queue, southCell)  )  queue.push( southCell );
+        if ( westCell  && westCell.pathStep  === null && ! inQueue(queue, westCell)  )  queue.push( westCell );
 
         cell.pathStep = 1;
           

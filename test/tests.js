@@ -376,3 +376,54 @@ QUnit.test( "lineAngleDeg", function( assert ) {
 	assert.equal( Math.round( lineAngleDeg(line) ), 354, "line short of north angle");
 
 });
+
+
+
+QUnit.test( "MapGrid", function( assert ) {
+
+    var mapGrid = new MapGrid(1,2,2);
+    
+    assert.equal( mapGrid.cells.length, 2, "x size of grid");
+    assert.equal( mapGrid.cells[1].length, 2, "y size of grid");
+    
+    var upperLeftCorner =  new MapCell(0,0,1);
+    var upperRightCorner =  new MapCell(1,0,1);
+    var lowerLeftCorner =  new MapCell(0,1,1);
+    var lowerRightCorner =  new MapCell(1,1,1);
+    
+    mapGrid.addCell(upperRightCorner);
+    mapGrid.addCell(upperLeftCorner);
+    mapGrid.addCell(lowerRightCorner);
+    mapGrid.addCell(lowerLeftCorner);
+    
+    assert.equal( mapGrid.cellNorth( upperLeftCorner ), null, 'upperLeftCorner north');
+    assert.equal( mapGrid.cellEast( upperLeftCorner ).x, 1, 'upperLeftCorner east x');
+    assert.equal( mapGrid.cellEast( upperLeftCorner ).y, 0, 'upperLeftCorner east y');
+    assert.equal( mapGrid.cellSouth( upperLeftCorner ).x, 0, 'upperLeftCorner south x');
+    assert.equal( mapGrid.cellSouth( upperLeftCorner ).y, 1, 'upperLeftCorner south y');
+    assert.equal( mapGrid.cellWest( upperLeftCorner ), null, 'upperLeftCorner west');
+    
+    
+    assert.equal( mapGrid.cellNorth( upperRightCorner ), null, 'upperRightCorner north');
+    assert.equal( mapGrid.cellEast( upperRightCorner ), null, 'upperRightCorner east');
+    assert.equal( mapGrid.cellSouth( upperRightCorner ).y, 1, 'upperRightCorner south y');
+    assert.equal( mapGrid.cellSouth( upperRightCorner ).x, 1, 'upperRightCorner south x');
+    assert.equal( mapGrid.cellWest( upperRightCorner ).x, 0, 'upperRightCorner west x');
+    assert.equal( mapGrid.cellWest( upperRightCorner ).y, 0, 'upperRightCorner west y');
+    
+    assert.equal( mapGrid.cellNorth( lowerLeftCorner ).x, 0, 'lowerLeftCorner north x');
+    assert.equal( mapGrid.cellNorth( lowerLeftCorner ).y, 0, 'lowerLeftCorner north y');
+    assert.equal( mapGrid.cellEast( lowerLeftCorner ).x, 1, 'lowerLeftCorner east x');
+    assert.equal( mapGrid.cellEast( lowerLeftCorner ).y, 1, 'lowerLeftCorner east y');
+    assert.equal( mapGrid.cellSouth( lowerLeftCorner ), null, 'lowerLeftCorner south');
+    assert.equal( mapGrid.cellWest( lowerLeftCorner ), null, 'lowerLeftCorner west');
+    
+    
+    assert.equal( mapGrid.cellNorth( lowerRightCorner ).x, 1, 'lowerRightCorner north x');
+    assert.equal( mapGrid.cellNorth( lowerRightCorner ).y, 0, 'lowerRightCorner north y');
+    assert.equal( mapGrid.cellEast( lowerRightCorner ), null, 'lowerRightCorner east');
+    assert.equal( mapGrid.cellSouth( lowerRightCorner ), null, 'lowerRightCorner south');
+    assert.equal( mapGrid.cellWest( lowerRightCorner ).x, 0, 'lowerRightCorner west x');
+    assert.equal( mapGrid.cellWest( lowerRightCorner ).y, 1, 'lowerRightCorner west y');
+    
+});
