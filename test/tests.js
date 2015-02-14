@@ -526,6 +526,11 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
     var findRoute = new FindRoute(mapGrid);
     var route = findRoute.getRoute(robotCell, longestWallCell);
     
+    console.log('mapGrid.dump()=' + mapGrid.dump());
+
+    assert.equal( route.length , 1, "route.length");
+    assert.equal( route[0].x , 100, "route x");
+    assert.equal( route[0].y , 50, "route y");
     
 });
 
@@ -562,7 +567,7 @@ QUnit.test( "maproom.calcScanRoute 400x500", function( assert ) {
 	var robotCell = mapRoom.calcScanRoute();
 	var mapGrid = mapRoom.getMapGrid();
 	
-
+    // Get longest wall
     var wallSearch = new WallSearch(robotCell, mapGrid);
     var longestWallCell = wallSearch.getLongestWall();
 
@@ -572,6 +577,22 @@ QUnit.test( "maproom.calcScanRoute 400x500", function( assert ) {
     
     var getMaxLength = wallSearch.getMaxLength();
     assert.equal( getMaxLength , 9, "Longest wall length");
+
+    // Find the route
+    var findRoute = new FindRoute(mapGrid);
+    var route = findRoute.getRoute(robotCell, longestWallCell);
+    
+    console.log('mapGrid.dump()=' + mapGrid.dump());
+
+    assert.equal( route.length , 3, "route.length");
+    assert.equal( route[0].x , 200, "route x");
+    assert.equal( route[0].y , 250, "route y");
+
+    assert.equal( route[1].x , 200, "route x");
+    assert.equal( route[1].y , 300, "route y");
+
+    assert.equal( route[2].x , 200, "route x");
+    assert.equal( route[2].y , 350, "route y");
 
 });
 
