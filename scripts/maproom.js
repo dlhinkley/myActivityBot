@@ -389,8 +389,3 @@ function Walls(canvas) {
     	return intersects;
 	}
 }
-
-function FindRoute(beginCell, endCell, mapGrid) {
-    
-    
-}

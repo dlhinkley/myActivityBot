@@ -435,3 +435,143 @@ QUnit.test( "MapGrid", function( assert ) {
 
    
 });
+
+
+
+QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
+
+    var width = 200;
+    var height = 200;
+    var g = new Geometry();
+    
+    var walls = [
+		g.line(  g.point( 0,     0),            g.point(width, 0)		), // Top wall
+    	g.line(  g.point( width, 0),            g.point(width, height)	), // Left wall
+		g.line(  g.point( width, height),       g.point(0,     height)		), // right wall
+		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
+    ];	
+            
+    var room  		= new Room(null, walls,null);
+    var robot 		= new Robot(null,room);
+    robot.setPosition(100,100);
+    robot.setSize(25, 50);
+    
+    var mapRoom = new MapRoom(robot,null);
+
+    var route = null;
+
+	while ( ! mapRoom.complete ) {
+		
+		mapRoom.scanInitial();
+	}
+	
+	assert.ok(mapRoom.complete  , "Room navigation complete");
+
+	var robotCell = mapRoom.calcScanRoute();
+	var mapGrid = mapRoom.getMapGrid();
+	
+	console.log('robotCell=',robotCell);
+	
+	assert.equal( robotCell.x , 100, "Robot cell x");
+	assert.equal( robotCell.y , 100, "Robot cell y");
+	
+	// Cells around robot
+	var cellEast = mapGrid.cellEast(robotCell);
+	assert.equal( cellEast.x , 150, "Cell to east of robot x");
+	assert.equal( cellEast.y , 100, "Cell to east of robot y");
+
+    var cellWest =  mapGrid.cellWest(robotCell);
+	assert.equal( cellWest.x , 50, "Cell to west of robot x");
+	assert.equal( cellWest.y , 100, "Cell to west of robot y");
+
+    var cellNorth =  mapGrid.cellNorth(robotCell);
+	assert.equal( cellNorth.x , 100, "Cell to north of robot x");
+	assert.equal( cellNorth.y , 50, "Cell to north of robot y");
+
+    var cellSouth = mapGrid.cellSouth(robotCell);
+	assert.equal( cellSouth.x , 100, "Cell to south of robot x");
+	assert.equal( cellSouth.y , 150, "Cell to south of robot y");
+
+    // Walls around robot
+    var cellEastEast = mapGrid.cellEast( cellEast );
+	assert.equal( cellEastEast.x , 200, "Cell to east east of robot x");
+	assert.equal( cellEastEast.y , 100, "Cell to east east of robot y");
+	assert.ok(    cellEastEast.isWall() , "Cell to east east of robot wall");
+
+    var cellWestWest = mapGrid.cellWest( cellWest );
+	assert.equal( cellWestWest.x , 0, "Cell to west west of robot x");
+	assert.equal( cellWestWest.y , 100, "Cell to west west of robot y");
+	assert.ok(    cellWestWest.isWall() , "Cell to west west of robot wall");
+
+	assert.equal( mapGrid.cellNorth( mapGrid.cellNorth(robotCell)).x , 100, "Cell to north north of robot x");
+	assert.equal( mapGrid.cellNorth( mapGrid.cellNorth(robotCell)).y , 0, "Cell to north north of robot y");
+	assert.ok( mapGrid.cellNorth( mapGrid.cellNorth(robotCell)).isWall() , "Cell to north north of robot wall");
+
+	assert.equal( mapGrid.cellSouth( mapGrid.cellSouth(robotCell)).x , 100, "Cell to south south of robot x");
+	assert.equal( mapGrid.cellSouth( mapGrid.cellSouth(robotCell)).y , 200, "Cell to south south of robot y");
+	assert.ok( mapGrid.cellSouth( mapGrid.cellSouth(robotCell)).isWall() , "Cell to south south of robot wall");
+
+
+    var wallSearch = new WallSearch(robotCell, mapGrid);
+    var longestWallCell = wallSearch.getLongestWall();
+
+    
+	assert.ok( longestWallCell.x > 0 && longestWallCell.x < 500, "Longest wall x");
+	assert.equal( longestWallCell.y , 0, "Longest wall y");
+    
+    var getMaxLength = wallSearch.getMaxLength();
+    assert.equal( getMaxLength , 3, "Longest wall length");
+
+    // Find the route
+    var findRoute = new FindRoute(mapGrid);
+    mapGrid = findRoute.getRoute(robotCell, longestWallCell);
+    
+    
+});
+
+
+QUnit.test( "maproom.calcScanRoute 400x500", function( assert ) {
+
+    var g = new Geometry();
+    
+    var walls = [
+    		g.line(  g.point( 0, 0),                g.point(500/3,0)		), // Top wall left of door
+    		g.line(  g.point( 500 - 500/3, 0), g.point(500,0)		), // Top wall right of door
+        	g.line(  g.point( 500, 0),            g.point(500,400)	), // Left wall
+    		g.line(  g.point( 500, 400),       g.point(0,400)		), // right wall
+    		g.line(  g.point( 0, 400),           g.point(0,0)			),  // bottom wall
+    ];		
+            
+    var room  		= new Room(null, walls,null);
+    var robot 		= new Robot(null,room);
+    robot.setPosition(200,200);
+    robot.setSize(25, 50);
+
+    
+    var mapRoom = new MapRoom(robot,null);
+
+    var route = null;
+
+	while ( ! mapRoom.complete ) {
+		
+		mapRoom.scanInitial();
+	}
+	
+	assert.ok(mapRoom.complete  , "Room navigation complete");
+
+	var robotCell = mapRoom.calcScanRoute();
+	var mapGrid = mapRoom.getMapGrid();
+	
+
+    var wallSearch = new WallSearch(robotCell, mapGrid);
+    var longestWallCell = wallSearch.getLongestWall();
+
+    
+	assert.ok( longestWallCell.x > 0 && longestWallCell.x < 500, "Longest wall x");
+	assert.equal( longestWallCell.y , 400, "Longest wall y");
+    
+    var getMaxLength = wallSearch.getMaxLength();
+    assert.equal( getMaxLength , 9, "Longest wall length");
+
+});
+
