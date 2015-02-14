@@ -41,7 +41,6 @@ function MapRoom(robot, canvas) {
     			
     			walls.addGap();
 			}
-			
 		}
 		else {
 			
@@ -282,16 +281,17 @@ function MapRoom(robot, canvas) {
 	*/
     function MapGrid( gridSizeIn ) {
         
+        var self = this;
         var gridSize = gridSizeIn;
         var maxX  = 20;
         var maxY  = 20;
-        var cells = new Array(maxX);
+        this.cells = new Array(maxX);
         
 
         // Init grid
         for (var x = 0; x < maxX; x++) {
                 
-            cells[x] = new Array(maxY);
+            self.cells[x] = new Array(maxY);
         }
         function adjX(x) {
             
@@ -302,26 +302,26 @@ function MapRoom(robot, canvas) {
             return (y / gridSize);
         }
         
-        this.addCell = function( mapCell ) {
+        self.addCell = function( mapCell ) {
             
-            cells[ adjX(mapCell.x) ][ adjY(mapCell.y) ] = mapCell;
+            this.cells[ adjX(mapCell.x) ][ adjY(mapCell.y) ] = mapCell;
         }
         
-        this.cellWest = function(cell) {
+        self.cellWest = function(cell) {
             
             var x = adjX(cell.x) - 1;
             var y = adjY(cell.y);
             
             return getCell(x, y);
         }
-        this.cellEast = function(cell) {
+        self.cellEast = function(cell) {
             
             var x = adjX(cell.x) + 1;
             var y = adjY(cell.y);
             
             return getCell(x, y);
         }
-        this.cellSouth = function(cell) {
+        self.cellSouth = function(cell) {
             
             var x = adjX(cell.x);
             var y = adjY(cell.y) + 1;
@@ -330,39 +330,40 @@ function MapRoom(robot, canvas) {
         }
         function getCell(x, y) {
             
+            console.log('MapGrid.getCell x=' + x + ' y=' + y + ' cells=',self.cells);
             var cellOut = null;
             
-            if ( x > 0 && x < cells.length && y > 0 && y < cells[x].length ) {
+            if ( x > 0 && x < self.cells.length && y > 0 && y < self.cells[x].length ) {
             
-                cellOut = cells[ x ][ y ];
+                cellOut = self.cells[ x ][ y ];
             }
             return cellOut;             
             
         }
-        this.cellNorth = function(cell) {
+        self.cellNorth = function(cell) {
             
             var x = adjX(cell.x);
             var y = adjY(cell.y) - 1;
             
             return getCell(x, y);
         }
-        this.clearAllPathStep = function() {
+        self.clearAllPathStep = function() {
             
             for (var x = 0; x < maxX; x++ ) {
                 
                 for (var y = 0; y < maxY; y++ ) {
                     
-                    cells[x][y].pathStep = null;
+                    self.cells[x][y].pathStep = null;
                 }
             }
         }
         
         
-        this.get = function( x, y) {
+        self.get = function( x, y) {
             
             console.log('MapGrid.get x=' + x + ' y=' + y + ' x/gridSize=' + x / gridSize + ' y/gridSize=' + y/gridSize );
     
-            return cells[ adjX( x ) ][ adjY( y ) ];
+            return self.cells[ adjX( x ) ][ adjY( y ) ];
         }
     }
     /**
@@ -558,7 +559,7 @@ function FindRoute(beginCell, endCell, mapGrid) {
 /**
 * object for searchin for wall
 */
-function WallSearch(beginCell, mapGrid) {
+function WallSearch(beginCell, mapGrid, canvas) {
   
   var self = this;
   var maxLength = 0;
@@ -608,12 +609,13 @@ function WallSearch(beginCell, mapGrid) {
         var southCell = self.mapGrid.cellSouth( cell );
         var westCell  = self.mapGrid.cellWest(  cell );   
         
-        if ( northCell && northCell.pathStep === null && ! inQueue(queue, northCell) )  queue.push( northCell );
-        if ( eastCell  && eastCell.pathStep  === null && ! inQueue(queue, eastCell) )   queue.push( eastCell );
-        if ( southCell && southCell.pathStep === null && ! inQueue(queue, southCell) )  queue.push( southCell );
-        if ( westCell  && westCell.pathStep  === null && ! inQueue(queue, westCell) )   queue.push( westCell );
+        if ( northCell && northCell.pathStep === null )  queue.push( northCell );
+        if ( eastCell  && eastCell.pathStep  === null )  queue.push( eastCell );
+        if ( southCell && southCell.pathStep === null )  queue.push( southCell );
+        if ( westCell  && westCell.pathStep  === null )  queue.push( westCell );
 
         cell.pathStep = 1;
+          
           
         if ( cell.isWall() ) {
           
