@@ -426,4 +426,12 @@ QUnit.test( "MapGrid", function( assert ) {
     assert.equal( mapGrid.cellWest( lowerRightCorner ).x, 0, 'lowerRightCorner west x');
     assert.equal( mapGrid.cellWest( lowerRightCorner ).y, 1, 'lowerRightCorner west y');
     
+    mapGrid.clearAllPathStep();
+    
+    assert.equal( upperLeftCorner.pathStep, null, 'upperLeftCorner pathStep');
+    assert.equal( lowerRightCorner.pathStep, null, 'lowerRightCorner pathStep');
+    assert.equal( lowerLeftCorner.pathStep, null, 'lowerLeftCorner pathStep');
+    assert.equal( upperRightCorner.pathStep, null, 'upperRightCorner pathStep');
+
+   
 });
