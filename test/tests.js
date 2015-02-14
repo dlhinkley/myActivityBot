@@ -524,7 +524,7 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
 
     // Find the route
     var findRoute = new FindRoute(mapGrid);
-    mapGrid = findRoute.getRoute(robotCell, longestWallCell);
+    var route = findRoute.getRoute(robotCell, longestWallCell);
     
     
 });
