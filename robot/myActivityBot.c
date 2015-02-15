@@ -28,9 +28,14 @@ int main()                              // Main - execution begins!
   freqout(4, 2000, 2000);               // Start beep - low battery reset alarm
   drive_speed(0,0);                     // Start servos/encoders cog
   drive_setRampStep(10);                // Set ramping at 10 ticks/sec per 20 ms
-  sirc_setTimeout(50);                  // Remote timeout = 50 ms
+  //sirc_setTimeout(50);                  // Remote timeout = 50 ms
   
-  
+  char UP = 'k';
+  char LEFT = 'l';
+  char RIGHT = 'h';
+  char DOWN = 'j';
+  char STOP = 's';
+
 
   int DO = 22, CLK = 23, DI = 24, CS = 25;  // Declare SD I/O pins
   int IR = 7;                               // IR Port
@@ -41,30 +46,36 @@ int main()                              // Main - execution begins!
   {
     //while((input(7) + input(8)) == 2)    // Inner loop while whiskers not pressed 
     //{
-      int button = sirc_button(IR);      // check for remote key press
+     // int button = sirc_button(IR);      // check for remote key press
       char c = fdserial_rxChar(blue);
       
-      print(button);
+      //print(button);
       print(c);
   
       // Audio responses - if number key pressed, play named WAV file
-      if(button == 1 || c == '1')wav_play("hello.wav");               
-      if(button == 2 || c == '2')wav_play("follow.wav");   
-      if(button == 3 || c == '3')wav_play("byebye.wav");                
-      if(button == 4 || c == '4')wav_play("oops.wav");                
-      if(button == 5 || c == '5')wav_play("thankyou.wav");                 
-      if(button == 6 || c == '6')wav_play("dontknow.wav");                   
-      if(button == 7 || c == '7')wav_play("yes.wav");               
-      if(button == 8 || c == '8')wav_play("no.wav");                
-      if(button == 9 || c == '9')wav_play("maybe.wav"); 
-      if(button == 0 || c == '0')wav_play("electro.wav");                  
+      if(c == '1')wav_play("hello.wav");               
+      if(c == '2')wav_play("follow.wav");   
+      if(c == '3')wav_play("byebye.wav");                
+      if(c == '4')wav_play("oops.wav");                
+      if(c == '5')wav_play("thankyou.wav");                 
+      if(c == '6')wav_play("dontknow.wav");                   
+      if(c == '7')wav_play("yes.wav");               
+      if(c == '8')wav_play("no.wav");                
+      if(c == '9')wav_play("maybe.wav"); 
+      if(c == '0')wav_play("electro.wav");                  
   
       // Motion responses - if key pressed, set wheel speeds
-      if(button == CH_UP)drive_rampStep(128, 128);   // Forward
-      if(button == CH_DN)drive_rampStep(-128, -128); // Backward
-      if(button == VOL_DN)drive_rampStep(-128, 128); // Left turn      
-      if(button == VOL_UP)drive_rampStep(128, -128); // Right turn 
-      if(button == MUTE)drive_rampStep(0, 0);        // Stop 
+      //if(c == UP) print("Forward");
+      //if(c == DOWN) print("Backward");
+      //if(c == LEFT) print("Left turn");    
+      //if(c == RIGHT) print("Right turn");
+      //if(c == STOP) print("Stop");
+
+      if(c == UP)drive_rampStep(128, 128);   // Forward
+      if(c == DOWN)drive_rampStep(-128, -128); // Backward
+      if(c == LEFT)drive_rampStep(-128, 128); // Left turn      
+      if(c == RIGHT)drive_rampStep(128, -128); // Right turn 
+      if(c == STOP)drive_rampStep(0, 0);        // Stop 
     //}
 
     // Sensor response - if a whisker is pressed
