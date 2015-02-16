@@ -17,6 +17,17 @@ var commandKeyMatrix = {
                         'right': 'h',
                         'down': 'j',
                         'space': 's', // stop
+                        'q': 'q', // 0
+                        'w': 'w', // 22
+                        'e': 'e', // 45
+                        'r': 'r', // 67
+                        't': 't', // 90 degree
+                        'y': 'y', // 112
+                        'u': 'u', // 135
+                        'i': 'i', // 157
+                        'o': 'o', // 180
+                        'p': 'p', // ping
+                        'c': 'c', // coordinates
 };
 
 // make `process.stdin` begin emitting "keypress" events
@@ -55,8 +66,8 @@ process.stdin.resume();
 
 
 
-var coords = null;
-
+var distance = '';
+var rxIn = '';
 
 
 
@@ -76,8 +87,24 @@ btSerial.on('found', function(address, name) {
                 //
                 btSerial.on('data', function(buffer) {
                 
-                    console.log("recieved: " + buffer.toString('utf-8'));
-                    coords = buffer.toString('utf-8');
+                    var out = buffer.toString('utf-8');
+                    console.log('data out=' + out);
+                    
+                    for (var m = 0; m < out.length; m++) {
+                        
+                        console.log('data m=' + m + ' char=' + out.charAt(m));
+                        
+                        if ( out.charAt(m) === '\n' ) {
+                            
+                            distance = rxIn;
+                            rxIn = '';
+                            console.log('distance=' + distance);
+                        }
+                        else {
+                            
+                            rxIn += out.charAt(m);
+                        }
+                    }
                 });                   
                 
             }, function (error) {

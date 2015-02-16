@@ -1,18 +1,4 @@
 myActivityBot.c
--I ../../My Projects/AB-IR-Remote-Wav/library/libabdrive
--I ../../My Projects/AB-IR-Remote-Wav/library/libfdserial
--I ../../My Projects/AB-IR-Remote-Wav/library/libsimplei2c
--I ../../My Projects/AB-IR-Remote-Wav/library/libsimpletext
--I ../../My Projects/AB-IR-Remote-Wav/library/libsimpletools
--I ../../My Projects/AB-IR-Remote-Wav/library/libsirc
--I ../../My Projects/AB-IR-Remote-Wav/library/libwavplayer
--L ../../My Projects/AB-IR-Remote-Wav/library/libabdrive
--L ../../My Projects/AB-IR-Remote-Wav/library/libfdserial
--L ../../My Projects/AB-IR-Remote-Wav/library/libsimplei2c
--L ../../My Projects/AB-IR-Remote-Wav/library/libsimpletext
--L ../../My Projects/AB-IR-Remote-Wav/library/libsimpletools
--L ../../My Projects/AB-IR-Remote-Wav/library/libsirc
--L ../../My Projects/AB-IR-Remote-Wav/library/libwavplayer
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os
@@ -20,5 +6,4 @@ myActivityBot.c
 >-fno-exceptions
 >defs::-std=c99
 >-lm
->linker::-lsirc -lfdserial -labdrive -lwavplayer -lsimplei2c -lsimpletext -lsimpletools
 >BOARD::ACTIVITYBOARD
