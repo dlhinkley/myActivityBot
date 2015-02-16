@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "bluetooth-serial-port": "^1.2.1",
-    "keypress": "^0.2.1",
-    "prompt": "^0.2.14"
+    "engine.io": "^1.5.1",
+    "eureca.io": "^0.6.2",
+    "express": "^4.11.2",
+    "keypress": "^0.2.1"
   }
 }
