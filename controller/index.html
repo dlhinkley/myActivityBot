@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Eureca.io test</title>
+        <script src="node_modules/eureca.io/lib/EurecaClient.js"></script>
+    </head>
+    <body>    
+        <script>
+            var client = new Eureca.Client();
+ 
+            client.ready(function (proxy) {
+                proxy.hello();
+            });
+        </script>
+    </body>
+</html>
