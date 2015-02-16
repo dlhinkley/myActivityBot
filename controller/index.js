@@ -16,7 +16,8 @@ var commandKeyMatrix = {
                         'left': 'l',
                         'right': 'h',
                         'down': 'j',
-                        'space': 's', // stop
+                        'space': 's', // slow
+                        'x': 'x', // stop
                         'q': 'q', // 0
                         'w': 'w', // 22
                         'e': 'e', // 45
@@ -39,12 +40,12 @@ function sendCommand(command) {
     btSerial.write(new Buffer(command, 'utf-8'), function(err, bytesWritten) {
     
         if (err) console.log(err);
-        console.log("bytesWritten=",bytesWritten);
+        //console.log("bytesWritten=",bytesWritten);
     }); 
 }
 function keyPressEvent(ch, key) {
 
-  console.log('got "keypress"', key);
+  //console.log('got "keypress"', key);
   
   if (key && key.ctrl && key.name == 'c') {
     process.stdin.pause();
@@ -66,7 +67,7 @@ process.stdin.resume();
 
 
 
-var distance = '';
+var received = '';
 var rxIn = '';
 
 
@@ -88,17 +89,17 @@ btSerial.on('found', function(address, name) {
                 btSerial.on('data', function(buffer) {
                 
                     var out = buffer.toString('utf-8');
-                    console.log('data out=' + out);
+                    //console.log('data out=' + out);
                     
                     for (var m = 0; m < out.length; m++) {
                         
-                        console.log('data m=' + m + ' char=' + out.charAt(m));
+                        //console.log('data m=' + m + ' char=' + out.charAt(m));
                         
                         if ( out.charAt(m) === '\n' ) {
                             
-                            distance = rxIn;
+                            received = rxIn;
                             rxIn = '';
-                            console.log('distance=' + distance);
+                            console.log('received=' + received);
                         }
                         else {
                             
