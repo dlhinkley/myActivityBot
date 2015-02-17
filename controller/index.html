@@ -2,14 +2,56 @@
 <html>
     <head>
         <title>Eureca.io test</title>
-        <script src="node_modules/eureca.io/lib/EurecaClient.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+		<script src="/eureca.js"></script>
     </head>
-    <body>    
+    <body>
+        Status: <input type="text" name="status" value="" id="status">
+        <p>
+        Ping: <input type="text" name="pingbut" value="" id="ping">
+        <p>    
+        Coords: <input style="width: 200px;" type="text" name="coordsbut" value="" id="coords">
+        <p>    
+        <input type="button" name="up" value="up" onclick="server.up()">
+        <input type="button" name="down" value="down" onclick="server.down()">
+        
+        <p>
+        <input type="button" name="left" value="left" onclick="server.left()">
+        <input type="button" name="right" value="right" onclick="server.right()">
+        <p>
+        <input type="button" name="stop" value="stop" onclick="server.stop()">
+        <input type="button" name="slow" value="slow" onclick="server.slow()">
+        <p>
+        <input type="button" name="ping" value="ping" onclick="server.ping()">
+        <p>
+        <input type="button"  name="coords" value="coords" onclick="server.coords()">
         <script>
+            var connected = false;
+            var server = null;
             var client = new Eureca.Client();
- 
+            
+            // Client functions the server can call
+             client.exports.status = function (text)
+            {
+                console.log("status text=" + text);
+                $('#status').val(text);
+            }
+             client.exports.ping = function (text)
+            {
+                console.log("ping text=" + text);
+                $('#ping').val(text);
+            }             
+             client.exports.coords = function (text)
+            {
+                console.log("coords text=" + text);
+                $('#coords').val(text);
+            }             
+            
             client.ready(function (proxy) {
-                proxy.hello();
+                server = proxy;
+                server.connect();
+                connected = true;
+                //server.hello();
             });
         </script>
     </body>

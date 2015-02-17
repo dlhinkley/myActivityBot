@@ -1,4 +1,11 @@
-var btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
+
+// https://github.com/eelcocramer/node-bluetooth-serial-port
+//
+var btSerial = null;
+var received = '';
+var rxIn = '';
+var prevCommand = '';
+var eurecaClient = null;
 
 // https://github.com/TooTallNate/keypress
 /*
@@ -17,7 +24,9 @@ var commandKeyMatrix = {
                         'right': 'h',
                         'down': 'j',
                         'space': 's', // slow
+                        'slow': 's', // slow
                         'x': 'x', // stop
+                        'stop': 'x', // stop
                         'q': 'q', // 0
                         'w': 'w', // 22
                         'e': 'e', // 45
@@ -28,27 +37,68 @@ var commandKeyMatrix = {
                         'i': 'i', // 157
                         'o': 'o', // 180
                         'p': 'p', // ping
+                        'ping': 'p', // ping
                         'c': 'c', // coordinates
+                        'coords': 'c', // coordinates
 };
+function init() {
 
-// make `process.stdin` begin emitting "keypress" events
-keypress(process.stdin);
+    initEureca();
 
+    //initKeyPress();
+    
+    //initSerial();
+    
+}
+function initKeyPress() {
+    
+        // make `process.stdin` begin emitting "keypress" events
+    keypress(process.stdin);
+    // listen for the "keypress" event
+    process.stdin.on('keypress', keyPressEvent);
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+}
 function sendCommand(command) {
     
        // Send command to robot
     btSerial.write(new Buffer(command, 'utf-8'), function(err, bytesWritten) {
     
-        if (err) console.log(err);
+        if (err)  { 
+        console.log(err);
+        }
+        else {
+            
+            prevCommand = command;
+        }
         //console.log("bytesWritten=",bytesWritten);
     }); 
+}
+function receivedText(text) {
+    
+   console.log('receivedText text=' + text);
+       
+   received = rxIn;
+   
+   if ( prevCommand === commandKeyMatrix.ping ) {
+       
+       console.log('eureca ping text=' + text);
+       eurecaClient.ping(text);
+   }
+   if ( prevCommand === commandKeyMatrix.coords ) {
+       
+       console.log('eureca coords text=' + text);
+       eurecaClient.coords(text);
+   }    
 }
 function keyPressEvent(ch, key) {
 
   //console.log('got "keypress"', key);
   
+  // Cancel on control c
   if (key && key.ctrl && key.name == 'c') {
-    process.stdin.pause();
+    //process.stdin.pause();
+    process.exit(0);
   }
   else if (key && key.name && commandKeyMatrix.hasOwnProperty(key.name) ) {
       
@@ -60,72 +110,159 @@ function keyPressEvent(ch, key) {
   }
 }
 
-// listen for the "keypress" event
-process.stdin.on('keypress', keyPressEvent);
-process.stdin.setRawMode(true);
-process.stdin.resume();
 
 
-
-var received = '';
-var rxIn = '';
-
-
-
-btSerial.on('found', function(address, name) {
-
-	console.log('address=' + address);
-	console.log('name=' + name);
-	
-	if (name === 'RN42-9699' && address == '00-06-66-65-96-99' ) {
-	
-        btSerial.findSerialPortChannel(address, function(channel) {
-        
-            btSerial.connect(address, channel, function() {
-            
-                console.log('connected');
-                // Prepare response for command
-                //
-                btSerial.on('data', function(buffer) {
-                
-                    var out = buffer.toString('utf-8');
-                    //console.log('data out=' + out);
-                    
-                    for (var m = 0; m < out.length; m++) {
-                        
-                        //console.log('data m=' + m + ' char=' + out.charAt(m));
-                        
-                        if ( out.charAt(m) === '\n' ) {
-                            
-                            received = rxIn;
-                            rxIn = '';
-                            console.log('received=' + received);
-                        }
-                        else {
-                            
-                            rxIn += out.charAt(m);
-                        }
-                    }
-                });                   
-                
-            }, function (error) {
-                console.log('cannot connect',error);
-            });
+function btSerialFailureEvent(err) {
     
-            // close the connection when you're ready
-            //btSerial.close();
+    console.log("btSerialFailureEvent err=",err);
+}
+
+function initSerial() {
+
+    console.log('initSerial');
+
+    btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
+
+    btSerial.on('failure', btSerialFailureEvent);
+    
+    btSerial.on('found', function(address, name) {
+    
+    	console.log('address=' + address);
+    	console.log('name=' + name);
+    	
+    	eurecaClient.status('found bluetooth');
+    	
+    	if (name === 'RN42-9699' && address == '00-06-66-65-96-99' ) {
+    	
+            btSerial.findSerialPortChannel(address, function(channel) {
             
-        }, function(error) {
-            console.log('found nothing',error);
-        });
-	}
-	else {
+                btSerial.connect(address, channel, function() {
+                
+                    console.log('connected');
+                    eurecaClient.status('connected');
 
-		console.log('skipping ' + name);
-	}
-});
+                    // Prepare response for command
+                    //
+                    btSerial.on('data', function(buffer) {
+                    
+                        var out = buffer.toString('utf-8');
+                        //console.log('data out=' + out);
+                        
+                        for (var m = 0; m < out.length; m++) {
+                            
+                            //console.log('data m=' + m + ' char=' + out.charAt(m));
+                            
+                            if ( out.charAt(m) === '\n' ) {
+                                
+                                receivedText(rxIn);
+                                rxIn = '';
+                                console.log('received=' + received);
+                            }
+                            else {
+                                
+                                rxIn += out.charAt(m);
+                            }
+                        }
+                    });                   
+                    
+                }, function (error) {
+                    console.log('cannot connect',error);
+                });
+        
+                // close the connection when you're ready
+                //btSerial.close();
+                
+            }, function(error) {
+                console.log('found nothing',error);
+            });
+    	}
+    	else {
+    
+    		console.log('skipping ' + name);
+    	}
+    });
+    
+    
+    // Starts searching for bluetooth devices. When a device is found a 'found' event will be emitted.
+    btSerial.inquire();
+}
+function initEureca() {
+    
+     console.log('initEureca');
 
 
-// Starts searching for bluetooth devices. When a device is found a 'found' event will be emitted.
-btSerial.inquire();
+    var express = require('express')
+      , app = express(app)
+      , server = require('http').createServer(app);
+    var EurecaServer = require('eureca.io').EurecaServer;
+     
+    //we need to allow bar() function first
+    var eurecaServer = new EurecaServer({allow:['status','ping','coords']});
+     
+    eurecaServer.attach(server);
+     
+    // ... server initialisation
+    eurecaServer.exports.connect = function () {
+     //when a server side function is called
+     //we can access the client connection
+     //throught this.connection
+     
+        var conn = this.connection;
+        eurecaClient = eurecaServer.getClient(conn.id);
+        console.log('connected');
+        eurecaClient.status('initilized'); // Call the client's code
+        
+        initSerial();
 
+    } 
+     
+    //functions under "exports" namespace will be exposed to client side
+    eurecaServer.exports.up = function () {
+        console.log('Eureca up');
+        sendCommand(commandKeyMatrix.up);
+    }
+    eurecaServer.exports.left = function () {
+        console.log('Eureca left');
+        sendCommand(commandKeyMatrix.left);
+    } 
+    eurecaServer.exports.right = function () {
+        console.log('Eureca right');
+        sendCommand(commandKeyMatrix.right);
+    } 
+    eurecaServer.exports.down = function () {
+        console.log('Eureca down');
+        sendCommand(commandKeyMatrix.down);
+    }     
+    eurecaServer.exports.stop = function () {
+        console.log('Eureca stop');
+        sendCommand(commandKeyMatrix.stop);
+    }     
+    eurecaServer.exports.slow = function () {
+        console.log('Eureca slow');
+        sendCommand(commandKeyMatrix.slow);
+    }     
+    eurecaServer.exports.ping = function () {
+        console.log('Eureca ping');
+        sendCommand(commandKeyMatrix.ping);
+    }     
+    eurecaServer.exports.coords = function () {
+        console.log('Eureca coords');
+        sendCommand(commandKeyMatrix.coords);
+    }     
+    
+       //------------------------------------------
+     
+    //see browser client side code for index.html content
+    app.get('/', function (req, res, next) {
+        res.sendfile('index.html');
+    });
+    
+    server.listen('8000');
+    
+    console.log("");
+    console.log("");
+    console.log("Access/Refreash http://localhost:8000 to continue");
+    
+}
+
+init();
