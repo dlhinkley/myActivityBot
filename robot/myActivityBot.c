@@ -53,14 +53,16 @@
   int TDEG0,TDEG22,TDEG45,TDEG67,TDEG90,TDEG112,TDEG135,TDEG157,TDEG180;;
 
 
-static volatile int pingRange0 = 0;
 void pollPingSensors(void *par); // Use a cog to fill range variables with ping distances
 unsigned int pstack[256]; // If things get weird make this number bigger!
 
 
 // For Odometry
 int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
-static double heading = 0.0, x = 0.0, y = 0.0, trackWidth, distancePerCount;
+static double trackWidth, distancePerCount;
+
+static volatile double heading = 0.0, x = 0.0, y = 0.0;
+static volatile int pingRange0 = 0, turetHeading = 0, connected = 0;
 //static int speedLeft, speedRight;
 
 void getTicks();
@@ -71,6 +73,7 @@ fdserial *blue;
 
 int main()                              // Main - execution begins!
 {
+  
   int TDEG0 =  0 + correction,
       TDEG22 = 220 + correction,
       TDEG45 = 450 + correction,
@@ -100,6 +103,7 @@ int main()                              // Main - execution begins!
   
 
    servo_angle(TUR, TDEG90);  // default to straight ahead
+  turetHeading  = 90;
   
   //int DO = 22, CLK = 23, DI = 24, CS = 25;  // Declare SD I/O pins
   //int IR = 7;                               // IR Port
@@ -115,7 +119,8 @@ int main()                              // Main - execution begins!
      getTicks();  // Check for ticks
      
      if (fdserial_rxReady(blue) != 0) { // Non blocking check for data in the input buffer
-
+      connected = 1;
+      
       char c = fdserial_rxChar(blue);
       
   	   //drive_getTicks(&ticksLeftIn, &ticksRightIn);
@@ -164,30 +169,39 @@ int main()                              // Main - execution begins!
         }
         else if (c == KDEG0 ) {
             servo_angle(TUR, TDEG0);
+            turetHeading  = 0;
         }
         else if (c == KDEG22 ) {
             servo_angle(TUR, TDEG22); 
+            turetHeading  = 22;
         }
         else if (c == KDEG45 ) {
             servo_angle(TUR, TDEG45);
+            turetHeading  = 45;
         }
         else if (c == KDEG67 ) {
             servo_angle(TUR, TDEG67);  
+            turetHeading  = 067;
         }
         else if (c == KDEG90 ) {
             servo_angle(TUR, TDEG90);
+            turetHeading  = 90;
         }
         else if (c == KDEG112 ) {
             servo_angle(TUR, TDEG112); 
+            turetHeading  = 112;
         }
         else if (c == KDEG135 ) {
             servo_angle(TUR, TDEG135);
+            turetHeading  = 135;
         }
         else if (c == KDEG157 ) {
             servo_angle(TUR, TDEG157); 
+            turetHeading  = 157;
         }
         else if (c == KDEG180 ) {
             servo_angle(TUR, TDEG180);
+            turetHeading  = 180;
         }
         else if (c == KPING ) {
             writeDec(blue, pingRange0);
@@ -211,8 +225,6 @@ void displayTicks(void) {
 	// http://webdelcire.com/wordpress/archives/527
 	//double V = ((speedRight * distancePerCount) + (speedLeft * distancePerCount)) / 2;
 	//double Omega = ((speedRight * distancePerCount) - (speedLeft * distancePerCount)) / trackWidth;
-
-    dprint(blue, "x=%.3f y=%.3f heading=%.3f\n", x, y, heading);
 }
 
 void getTicks(void) {
@@ -245,7 +257,6 @@ void pollPingSensors(void *par) {
       
   while(1)                                    // Repeat indefinitely
   {
-    //high(26);
     pingRange0 = ping_cm(PING);                 // Get cm distance from Ping)))
     
     if ( pingRange0 < 15 ) {
@@ -254,77 +265,7 @@ void pollPingSensors(void *par) {
     }     
 	
     
-    pause(1000);                               // Wait 1 second
-    //low(26);
+    pause(3000);                               // Wait 1 second
+    if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d\n", x, y, heading, pingRange0, turetHeading);
   }
 }
-/*
-  Bluetooth Loopback.c
-*/
-/*
-#include "simpletools.h"
-#include "fdserial.h"
-
-fdserial *blue;
-
-int main()
-{
-  int toggle = 0;
-  
-  blue = fdserial_open(2, 1, 0, 9600);
-
-  print("running, \n");
-  low(26);
-  low(27);
-  
-  char c;
- 
-  while(1)
-  {
-    c = fdserial_rxChar(blue);
-    fdserial_txChar(blue,c); // echo back
-    
-    if(c != -1 && c != 0 )
-    {
-      print("%d\n", c);
-
-      if ( toggle == 1 ) {
-        
-          high(26);
-          low(27); 
-          toggle = 0;
-        
-      }
-      else {
-        
-          high(27);
-          low(26);
-          toggle = 1;
-      }                
-
-
-    }
-  }  
-}
-
-
-#include "simpletools.h"                      // Include simpletools header
-#include "servo.h"                            // Include servo header
-
-int main()                                    // main function
-{
-  int correction = -190;
-  
-  int deg90 = 900 + correction; //900
-  int deg0 = 0 + correction; //900
-  int deg180 = 1800 + correction; //900
-  servo_angle(17, deg0);                         // P16 servo to 0 degrees
-  pause(3000);                                // ...for 3 seconds
-  servo_angle(17, deg90);                       // P16 servo to 90 degrees
-  pause(3000);                                // ...for 3 seconds
-  servo_angle(17, deg180);                      // P16 servo to 180 degrees
-  pause(3000);                                // ...for 3 seconds
-  servo_stop();                               // Stop servo process
-}
-
-*/

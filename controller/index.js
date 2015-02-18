@@ -80,16 +80,62 @@ function receivedText(text) {
        
    received = rxIn;
    
-   if ( prevCommand === commandKeyMatrix.ping ) {
+   if ( text.length > 14 && text.substring(0, 14) == 'command=update') {
+       
+       processUpdateCommand(text);
+   }
+   else if ( prevCommand === commandKeyMatrix.ping ) {
        
        console.log('eureca ping text=' + text);
        eurecaClient.ping(text);
    }
-   if ( prevCommand === commandKeyMatrix.coords ) {
+   else if ( prevCommand === commandKeyMatrix.coords ) {
        
        console.log('eureca coords text=' + text);
        eurecaClient.coords(text);
    }    
+}
+function processUpdateCommand(text) {
+    
+    text = text.trim();
+    
+    var commandValues = text.split(',');
+    //console.log("commandValues=",commandValues);
+    
+    for (var m = 0; m < commandValues.length; m++ ) {
+        
+        //console.log("commandValues[m]=" + commandValues[m] + ' m=' + m);
+        var parts = commandValues[m].split('=');
+        
+        //console.log('parts=',parts);
+        
+        var command = parts[0];
+        var value = parts[1];
+        
+        //console.log('command=' + command + ' value=' + value);
+        
+        if ( command === 'x' ) {
+            
+            eurecaClient.setX(value);
+        }
+        else if ( command === 'y' ) {
+            
+            eurecaClient.setY(value);
+        }
+        else if ( command === 'heading' ) {
+            
+            eurecaClient.heading(value);
+        }
+        else if ( command === 'ping' ) {
+            
+            eurecaClient.ping(value);
+        }
+        else if ( command === 'turet' ) {
+            
+            eurecaClient.turet(value);
+        }
+     }
+    
 }
 function keyPressEvent(ch, key) {
 
@@ -197,7 +243,7 @@ function initEureca() {
     var EurecaServer = require('eureca.io').EurecaServer;
      
     //we need to allow bar() function first
-    var eurecaServer = new EurecaServer({allow:['status','ping','coords']});
+    var eurecaServer = new EurecaServer({allow:['status','ping','setX','setY','heading','turet']});
      
     eurecaServer.attach(server);
      
@@ -253,9 +299,12 @@ function initEureca() {
        //------------------------------------------
      
     //see browser client side code for index.html content
+/*
     app.get('/', function (req, res, next) {
         res.sendfile('index.html');
     });
+*/
+    app.use(express.static(__dirname + '/public_html'));
     
     server.listen('8000');
     
