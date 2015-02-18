@@ -8,13 +8,25 @@
     <body>
         Status: <input type="text" name="status" value="" id="status">
         <p>
-        <div style="position:relative; width: 200px; height:220px; background: url('images/control.jpg') 200px 0px;">
-          <div id="upArrow" style="position:absolute; left:75px; top: 10px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.up()"></div>
-          <div id="downArrow" style="position:absolute; left:75px; top: 145px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.down()"></div>
-          <div id="leftArrow" style="position:absolute; left:10px; top: 75px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.left()"></div>
-          <div id="rightArrow" style="position:absolute; left:135px; top: 79px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.right()"></div>
+        <div id="direction-container">
+            <div id="direction-stop-container" style="float:left;">
+                <div style="position:relative; width: 200px; height:220px; background: url('images/control.jpg') 200px 0px;">
+                  <div id="upArrow" style="position:absolute; left:75px; top: 10px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.up()"></div>
+                  <div id="downArrow" style="position:absolute; left:75px; top: 145px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.down()"></div>
+                  <div id="leftArrow" style="position:absolute; left:10px; top: 75px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.left()"></div>
+                  <div id="rightArrow" style="position:absolute; left:135px; top: 79px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="server.right()"></div>
+                </div>
+                <div id="stop" style="position:relative; width: 210px; height:110px; background: url('images/control.jpg') -225px 0px; cursor: pointer; cursor: hand;" onclick="server.stop()"></div>
+            </div>
+            <div id="turet-container" style="position:relative;float:left;">
+                <div style="position:relative; width: 200px; height:138px; background: url('images/control.jpg') 200px 0px;">
+                  <div id="upArrow" style="position:absolute; left:75px; top: 10px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="turetStraight()"></div>
+                  <div id="leftArrow" style="position:absolute; left:10px; top: 75px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="turetLeft()"></div>
+                  <div id="rightArrow" style="position:absolute; left:135px; top: 79px; width: 50px; height: 50px; cursor: pointer; cursor: hand;" onclick="turetRight()"></div>
+                </div>
+            </div>
+            <div style="clear:both"></div>
         </div>
-        <div id="stop" style="position:relative; width: 210px; height:110px; background: url('images/control.jpg') -225px 0px; cursor: pointer; cursor: hand;" onclick="server.stop()"></div>
         <p>
         
         Ping: <input type="text" name="ping" value="" id="ping">
@@ -73,6 +85,18 @@
                 connected = true;
                 //server.hello();
             });
+            function turetRight() {
+                
+                
+            }
+            function turetLeft() {
+                
+                
+            }
+            function turetStraight() {
+                
+                
+            }
         </script>
     </body>
 </html>

@@ -16,7 +16,9 @@ var eurecaClient = null;
 
   } 
 */
-var keypress = require('keypress');
+/* var keypress = require('keypress'); */
+
+var turet = null;
 
 var commandKeyMatrix = {
                         'up': 'k',
@@ -45,20 +47,10 @@ function init() {
 
     initEureca();
 
-    //initKeyPress();
-    
-    //initSerial();
+    turet = new Turet();
     
 }
-function initKeyPress() {
-    
-        // make `process.stdin` begin emitting "keypress" events
-    keypress(process.stdin);
-    // listen for the "keypress" event
-    process.stdin.on('keypress', keyPressEvent);
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
-}
+
 function sendCommand(command) {
     
        // Send command to robot
@@ -132,6 +124,7 @@ function processUpdateCommand(text) {
         }
         else if ( command === 'turet' ) {
             
+            turet.setDirection(value);
             eurecaClient.turet(value);
         }
      }
@@ -291,10 +284,19 @@ function initEureca() {
         console.log('Eureca ping');
         sendCommand(commandKeyMatrix.ping);
     }     
-    eurecaServer.exports.coords = function () {
-        console.log('Eureca coords');
-        sendCommand(commandKeyMatrix.coords);
+    eurecaServer.exports.left = function () {
+        console.log('Eureca turet left');
+        sendCommand(commandKeyMatrix.ping);
     }     
+    eurecaServer.exports.right = function () {
+        console.log('Eureca turet right');
+        sendCommand(commandKeyMatrix.ping);
+    }     
+    eurecaServer.exports.straight = function () {
+        console.log('Eureca turet straight');
+        sendCommand(commandKeyMatrix.ping);
+    }     
+    
     
        //------------------------------------------
      
@@ -313,5 +315,20 @@ function initEureca() {
     console.log("Access/Refreash http://localhost:8000 to continue");
     
 }
-
+function Turet() {
+    
+    self = this;
+    self.direction = 0;
+    
+    self.directions = [{'0': 'q'},{'22':'w'} ,{'45':'e'},{'67':'r'},{'90':'t'},{'112':'y'},{'135':'u'},{'157':'i'},{'180','o'}]
+    self.pointer = 5; // default to 90 degree
+    
+    self.setDirection(value) {
+        
+        self.direction = value;
+        
+        
+    }
+    
+}
 init();
