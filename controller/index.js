@@ -68,7 +68,7 @@ function sendCommand(command) {
 }
 function receivedText(text) {
     
-   console.log('receivedText text=' + text);
+   //console.log('receivedText text=' + text);
        
    received = rxIn;
    
@@ -195,7 +195,7 @@ function initSerial() {
                                 
                                 receivedText(rxIn);
                                 rxIn = '';
-                                console.log('received=' + received);
+                                //console.log('received=' + received);
                             }
                             else {
                                 
@@ -284,17 +284,20 @@ function initEureca() {
         console.log('Eureca ping');
         sendCommand(commandKeyMatrix.ping);
     }     
-    eurecaServer.exports.left = function () {
+    eurecaServer.exports.turetLeft = function () {
         console.log('Eureca turet left');
-        sendCommand(commandKeyMatrix.ping);
+        turet.left();
+        sendCommand( turet.getCommand() );
     }     
-    eurecaServer.exports.right = function () {
+    eurecaServer.exports.turetRight = function () {
         console.log('Eureca turet right');
-        sendCommand(commandKeyMatrix.ping);
+        turet.right();
+        sendCommand( turet.getCommand() );
     }     
-    eurecaServer.exports.straight = function () {
+    eurecaServer.exports.turetStraight = function () {
         console.log('Eureca turet straight');
-        sendCommand(commandKeyMatrix.ping);
+        turet.straight();
+        sendCommand( turet.getCommand() );
     }     
     
     
@@ -320,14 +323,52 @@ function Turet() {
     self = this;
     self.direction = 0;
     
-    self.directions = [{'0': 'q'},{'22':'w'} ,{'45':'e'},{'67':'r'},{'90':'t'},{'112':'y'},{'135':'u'},{'157':'i'},{'180','o'}]
-    self.pointer = 5; // default to 90 degree
+    self.directions = [
+    {'deg':'0','cmd': 'q'},
+    {'deg':'22','cmd':'w'},
+    {'deg':'45','cmd':'e'},
+    {'deg':'67','cmd':'r'},
+    {'deg':'90','cmd':'t'},
+    {'deg':'112','cmd':'y'},
+    {'deg':'135','cmd':'u'},
+    {'deg':'157','cmd':'i'},
+    {'deg':'180','cmd':'o'}
+    ];
+    self.pointer = 4; // default to 90 degree
     
-    self.setDirection(value) {
+    self.right = function() {
+        
+        if ( self.pointer - 1 >= 0 )  {
+            
+            self.pointer--;
+        }
+    }
+    self.getCommand = function() {
+        
+        return self.directions[ self.pointer ].cmd;
+    }
+    self.left = function() {
+        
+        if ( self.pointer + 1 < self.directions.length )  {
+            
+            self.pointer++;
+        }
+    }
+    self.straight = function() {
+        
+        self.setDirection('90');
+    }
+    self.setDirection = function(value) {
         
         self.direction = value;
         
-        
+        for ( var m = 0; m < self.directions.length; m++) {
+            
+            if ( self.directions[m].deg === value ) {
+                
+                self.pointer = m;
+            }
+        }
     }
     
 }
