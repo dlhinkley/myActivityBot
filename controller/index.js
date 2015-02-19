@@ -1,7 +1,7 @@
 
 // https://github.com/eelcocramer/node-bluetooth-serial-port
 //
-var btSerial = null;
+var blueTooth = null;
 var received = '';
 var rxIn = '';
 var prevCommand = '';
@@ -49,23 +49,11 @@ function init() {
 
     turet = new Turet();
     
+    blueTooth = new BlueTooth();
+    
 }
 
-function sendCommand(command) {
-    
-       // Send command to robot
-    btSerial.write(new Buffer(command, 'utf-8'), function(err, bytesWritten) {
-    
-        if (err)  { 
-        console.log(err);
-        }
-        else {
-            
-            prevCommand = command;
-        }
-        //console.log("bytesWritten=",bytesWritten);
-    }); 
-}
+
 function receivedText(text) {
     
    //console.log('receivedText text=' + text);
@@ -141,30 +129,78 @@ function keyPressEvent(ch, key) {
   }
   else if (key && key.name && commandKeyMatrix.hasOwnProperty(key.name) ) {
       
-    sendCommand( commandKeyMatrix[ key.name ]);
+    blueTooth.sendCommand( commandKeyMatrix[ key.name ]);
       
   }
   else if (key && key.name) {
-    sendCommand(key.name);
+    blueTooth.sendCommand(key.name);
   }
 }
 
+function BlueTooth() {
 
-
-function btSerialFailureEvent(err) {
+    var self = this,
+        btSerial = null;
     
-    console.log("btSerialFailureEvent err=",err);
-}
-
-function initSerial() {
-
-    console.log('initSerial');
-
-    btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
-
-    btSerial.on('failure', btSerialFailureEvent);
+    function init() {
     
-    btSerial.on('found', function(address, name) {
+        //console.log('initSerial');
+    
+        btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
+    
+        btSerial.on('failure', btSerialFailureEvent);
+        
+        btSerial.on('found', btSerialFoundEvent);
+        
+        
+    }
+    self.connect = function() {
+        
+        console.log('bluetooth connecting..');
+        // Starts searching for bluetooth devices. When a device is found a 'found' event will be emitted.
+        btSerial.inquire();
+    }
+    self.sendCommand = function (command) {
+    
+       // Send command to robot
+        btSerial.write(new Buffer(command, 'utf-8'), function(err, bytesWritten) {
+        
+            if (err)  { 
+                console.log(err);
+            }
+            else {
+                
+                prevCommand = command;
+            }
+            //console.log("bytesWritten=",bytesWritten);
+        }); 
+    }
+    function btSerialFailureEvent(err) {
+        
+        console.log("btSerialFailureEvent err=",err);
+    }
+    function btSerialDataEvent(buffer) {
+                        
+        var out = buffer.toString('utf-8');
+        //console.log('data out=' + out);
+        
+        for (var m = 0; m < out.length; m++) {
+            
+            //console.log('data m=' + m + ' char=' + out.charAt(m));
+            
+            if ( out.charAt(m) === '\n' ) {
+                
+                receivedText(rxIn);
+                rxIn = '';
+                //console.log('received=' + received);
+            }
+            else {
+                
+                rxIn += out.charAt(m);
+            }
+        }
+    }
+    function btSerialFoundEvent(address, name) {
     
     	console.log('address=' + address);
     	console.log('name=' + name);
@@ -182,27 +218,7 @@ function initSerial() {
 
                     // Prepare response for command
                     //
-                    btSerial.on('data', function(buffer) {
-                    
-                        var out = buffer.toString('utf-8');
-                        //console.log('data out=' + out);
-                        
-                        for (var m = 0; m < out.length; m++) {
-                            
-                            //console.log('data m=' + m + ' char=' + out.charAt(m));
-                            
-                            if ( out.charAt(m) === '\n' ) {
-                                
-                                receivedText(rxIn);
-                                rxIn = '';
-                                //console.log('received=' + received);
-                            }
-                            else {
-                                
-                                rxIn += out.charAt(m);
-                            }
-                        }
-                    });                   
+                    btSerial.on('data', btSerialDataEvent);                   
                     
                 }, function (error) {
                     console.log('cannot connect',error);
@@ -219,11 +235,9 @@ function initSerial() {
     
     		console.log('skipping ' + name);
     	}
-    });
+    }
     
-    
-    // Starts searching for bluetooth devices. When a device is found a 'found' event will be emitted.
-    btSerial.inquire();
+    init();
 }
 function initEureca() {
     
@@ -235,7 +249,7 @@ function initEureca() {
       , server = require('http').createServer(app);
     var EurecaServer = require('eureca.io').EurecaServer;
      
-    //we need to allow bar() function first
+    //Allow the server to access these client calls
     var eurecaServer = new EurecaServer({allow:['status','ping','setX','setY','heading','turet']});
      
     eurecaServer.attach(server);
@@ -248,56 +262,56 @@ function initEureca() {
      
         var conn = this.connection;
         eurecaClient = eurecaServer.getClient(conn.id);
-        console.log('connected');
+        console.log('browser connected');
         eurecaClient.status('initilized'); // Call the client's code
         
-        initSerial();
+        blueTooth.connect();
 
     } 
      
     //functions under "exports" namespace will be exposed to client side
     eurecaServer.exports.up = function () {
         console.log('Eureca up');
-        sendCommand(commandKeyMatrix.up);
+        blueTooth.sendCommand(commandKeyMatrix.up);
     }
     eurecaServer.exports.left = function () {
         console.log('Eureca left');
-        sendCommand(commandKeyMatrix.left);
+        blueTooth.sendCommand(commandKeyMatrix.left);
     } 
     eurecaServer.exports.right = function () {
         console.log('Eureca right');
-        sendCommand(commandKeyMatrix.right);
+        blueTooth.sendCommand(commandKeyMatrix.right);
     } 
     eurecaServer.exports.down = function () {
         console.log('Eureca down');
-        sendCommand(commandKeyMatrix.down);
+        blueTooth.sendCommand(commandKeyMatrix.down);
     }     
     eurecaServer.exports.stop = function () {
         console.log('Eureca stop');
-        sendCommand(commandKeyMatrix.stop);
+        blueTooth.sendCommand(commandKeyMatrix.stop);
     }     
     eurecaServer.exports.slow = function () {
         console.log('Eureca slow');
-        sendCommand(commandKeyMatrix.slow);
+        blueTooth.sendCommand(commandKeyMatrix.slow);
     }     
     eurecaServer.exports.ping = function () {
         console.log('Eureca ping');
-        sendCommand(commandKeyMatrix.ping);
+        blueTooth.sendCommand(commandKeyMatrix.ping);
     }     
     eurecaServer.exports.turetLeft = function () {
         console.log('Eureca turet left');
         turet.left();
-        sendCommand( turet.getCommand() );
+        blueTooth.sendCommand( turet.getCommand() );
     }     
     eurecaServer.exports.turetRight = function () {
         console.log('Eureca turet right');
         turet.right();
-        sendCommand( turet.getCommand() );
+        blueTooth.sendCommand( turet.getCommand() );
     }     
     eurecaServer.exports.turetStraight = function () {
         console.log('Eureca turet straight');
         turet.straight();
-        sendCommand( turet.getCommand() );
+        blueTooth.sendCommand( turet.getCommand() );
     }     
     
     

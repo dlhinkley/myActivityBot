@@ -1,16 +1,5 @@
 /*
-  AB-IR-Remote-Wav.c
-  10/30/2013 version 0.5
-  http://learn.parallax.com/activitybot
-
-  ActivityBot plays WAV files on speaker from SD card
-  Sensors: IR receiver on P10, touch whiskers on P7 & P8
-  Control with Sony-compatible remote (Parallax #020-00001)
-  (Brightstar: hold Setup until lit, then enter 605)
-  Drive with 5 buttons: Channel+/-, Vol +/-, and mute
-  Number keys select WAV files to play
-  If whiskers are pressed, robot backs up & stops, plays WAV
-  
+ 
   Location code from: https://github.com/chrisl8/ActivityBot/blob/master/Propeller/ROS%20Interface%20for%20ActivityBot.c
   
   
@@ -66,7 +55,6 @@ static volatile int pingRange0 = 0, turetHeading = 0, connected = 0;
 //static int speedLeft, speedRight;
 
 void getTicks();
-void displayTicks();
 void stopIfWall();
 
 fdserial *blue;
@@ -207,9 +195,7 @@ int main()                              // Main - execution begins!
             writeDec(blue, pingRange0);
             writeChar(blue,'\n');
         }
-        else if (c == KCOORD ) {
-            displayTicks();
-        }
+
         else if (c == KBEARNG ) {
             writeDec(blue, heading);
             writeChar(blue,'\n');
@@ -219,13 +205,7 @@ int main()                              // Main - execution begins!
   }            
 }
  
-void displayTicks(void) {
 
-
-	// http://webdelcire.com/wordpress/archives/527
-	//double V = ((speedRight * distancePerCount) + (speedLeft * distancePerCount)) / 2;
-	//double Omega = ((speedRight * distancePerCount) - (speedLeft * distancePerCount)) / trackWidth;
-}
 
 void getTicks(void) {
 	ticksLeftOld = ticksLeft;
