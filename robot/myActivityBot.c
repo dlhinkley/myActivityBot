@@ -30,17 +30,29 @@
       KDEG180 = 'o',
       KCOORD = 'c',
       KBEARNG = 'b',
-      KPING = 'p';
+      KPING = 'p',
+      KSCAN = 'n';
       
-      
+ int TDEG0,
+      TDEG22,
+      TDEG45,
+      TDEG67,
+      TDEG90,
+      TDEG112,
+      TDEG135,
+      TDEG157,
+      TDEG180;    
+       
   int dist = 0;
       
   int TUR = 17; // Turret pin
   int PING = 16; // Ping pin
   int correction = -190; // turret correction
 
-  int TDEG0,TDEG22,TDEG45,TDEG67,TDEG90,TDEG112,TDEG135,TDEG157,TDEG180;;
 
+      
+// The directions durring a scan
+volatile char turetDir[5];
 
 void pollPingSensors(void *par); // Use a cog to fill range variables with ping distances
 unsigned int pstack[256]; // If things get weird make this number bigger!
@@ -51,27 +63,40 @@ int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
 static double trackWidth, distancePerCount;
 
 static volatile double heading = 0.0, x = 0.0, y = 0.0;
-static volatile int pingRange0 = 0, turetHeading = 0, connected = 0;
+static volatile int pingRange0 = 0, turetHeading = 0, connected = 0, turetScan = 0;
 //static int speedLeft, speedRight;
 
 void getTicks();
 void stopIfWall();
+void positionTuret(char);
 
 fdserial *blue;
 
 int main()                              // Main - execution begins!
 {
   
-  int TDEG0 =  0 + correction,
-      TDEG22 = 220 + correction,
-      TDEG45 = 450 + correction,
-      TDEG67 = 670 + correction,
-      TDEG90 = 900 + correction, //900
-      TDEG112 = 1120 + correction,
-      TDEG135 = 1350 + correction,
-      TDEG157 = 1570 + correction,
-      TDEG180 = 1800 + correction;
-        
+  TDEG0 =  0 + correction,
+  TDEG22 = 220 + correction,
+  TDEG45 = 450 + correction,
+  TDEG67 = 670 + correction,
+  TDEG90 = 900 + correction, //900
+  TDEG112 = 1120 + correction,
+  TDEG135 = 1350 + correction,
+  TDEG157 = 1570 + correction,
+  TDEG180 = 1800 + correction;
+      
+  //turetDir[0] = KDEG22;
+  turetDir[0] = KDEG45;
+  turetDir[1] = KDEG67;
+  turetDir[2] = KDEG90;
+  turetDir[3] = KDEG112;
+  turetDir[4] = KDEG135;
+  //turetDir[6] = KDEG157;
+  
+  // Turn off LEDs
+  low(27);                   
+  low(26);
+       
   simpleterm_close(); 
   blue = fdserial_open(2, 1, 0, 9600);
 
@@ -155,7 +180,40 @@ int main()                              // Main - execution begins!
         else if (c == STOP ) {
             drive_speed(0, 0);        // Stop
         }
-        else if (c == KDEG0 ) {
+       
+        else if (c == KPING ) {
+            writeDec(blue, pingRange0);
+            writeChar(blue,'\n');
+        }
+
+        else if (c == KBEARNG ) {
+            writeDec(blue, heading);
+            writeChar(blue,'\n');
+        }        
+        else if ( c == KSCAN ) {
+         
+          // Toggle the scan status
+          if ( turetScan == 0 ) {
+            
+            turetScan = 1;
+          }
+          else {
+            
+            turetScan = 0;
+            positionTuret(KDEG90); 
+          }                         
+        }
+        else {
+          
+          positionTuret(c);
+        }                    
+     }                       
+  }            
+}
+ 
+void positionTuret(char c) {
+  
+        if (c == KDEG0 ) {
             servo_angle(TUR, TDEG0);
             turetHeading  = 0;
         }
@@ -190,22 +248,9 @@ int main()                              // Main - execution begins!
         else if (c == KDEG180 ) {
             servo_angle(TUR, TDEG180);
             turetHeading  = 180;
-        }
-        else if (c == KPING ) {
-            writeDec(blue, pingRange0);
-            writeChar(blue,'\n');
-        }
-
-        else if (c == KBEARNG ) {
-            writeDec(blue, heading);
-            writeChar(blue,'\n');
-        }        
-      
-     }                       
-  }            
-}
- 
-
+        } 
+  
+}  
 
 void getTicks(void) {
 	ticksLeftOld = ticksLeft;
@@ -235,17 +280,56 @@ void getTicks(void) {
 }
 void pollPingSensors(void *par) {
       
+  int scanPtr = 2; // position for 90 degrees
+  int directionToggle = 1;
   while(1)                                    // Repeat indefinitely
   {
     pingRange0 = ping_cm(PING);                 // Get cm distance from Ping)))
     
+    // If we're about to run into something, stop
+    //
     if ( pingRange0 < 15 ) {
       
       drive_speed(0, 0);  
     }     
 	
     
-    pause(3000);                               // Wait 1 second
-    if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d\n", x, y, heading, pingRange0, turetHeading);
+    pause(250);                               // Wait 1 second
+    if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d,scan=%d\n", x, y, heading, pingRange0, turetHeading,turetScan);
+
+    // If scan enabled
+    if ( turetScan == 1 ) {
+      
+       // scanPtr = 2
+       // directionToggle = 1
+       
+       // Change the position of the turet
+       int dir = turetDir[ scanPtr ];
+       // dir 135
+       positionTuret(dir); 
+       pause(250); // Pause a second to make sure the turet is positioned
+       
+       
+       // If the ptr is greater than the number of positions, go the other way
+       if ( scanPtr + directionToggle == sizeof(turetDir)) {
+         high(26);                   
+         low(27);
+         directionToggle = -1;
+       }
+       // If the ptr is less than 0, go the other way
+       else if ( scanPtr + directionToggle < 0 ) {
+         
+         high(27);                   
+         low(26);
+         directionToggle = 1;
+       }   
+       else {
+         
+         high(27);                   
+         high(26); 
+       }                              
+       scanPtr += directionToggle;
+    }      
+
   }
 }

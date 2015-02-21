@@ -42,6 +42,8 @@ var commandKeyMatrix = {
                         'ping': 'p', // ping
                         'c': 'c', // coordinates
                         'coords': 'c', // coordinates
+                        'n': 'n', // Turet scan 
+                        'scan': 'n', // Turet scan 
 };
 function init() {
 
@@ -297,6 +299,10 @@ function initEureca() {
     eurecaServer.exports.ping = function () {
         console.log('Eureca ping');
         blueTooth.sendCommand(commandKeyMatrix.ping);
+    }     
+    eurecaServer.exports.scan = function () {
+        console.log('Eureca turet scan');
+        blueTooth.sendCommand(commandKeyMatrix.scan);
     }     
     eurecaServer.exports.turetLeft = function () {
         console.log('Eureca turet left');
