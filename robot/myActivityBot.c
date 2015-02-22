@@ -28,7 +28,6 @@ const int TUR = 17,       // Turet pin
 
 int correction = -190; // turret correction
 
-
 // For Odometry
 int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
 static double trackWidth, distancePerCount;
@@ -74,8 +73,8 @@ int main()
 
 	drive_speed(0,0);                     // Start servos/encoders cog
 	drive_setRampStep(10);                // Set ramping at 10 ticks/sec per 20 ms
-	//sirc_setTimeout(50);                  // Remote timeout = 50 ms
 
+  
 	int dir = 900 + correction;
 	servo_angle(TUR, dir);
 	turetHeading  = 90;
@@ -153,6 +152,9 @@ void executeCommand(char cmdbuf[], int  val) {
 			servo_angle(TUR, dir);
 			turetHeading  = 90;
 		}                         
+	}
+	else if ( strcmp(cmdbuf,"speed") == 0 ) {
+    drive_setMaxSpeed(val);
 	}
 	else if ( strcmp(cmdbuf,"up") == 0 ) {
 		drive_goto(val,val);
@@ -256,6 +258,8 @@ void pollPingSensors(void *par) {
 		pause(500);                               // Wait 1 second
 
 		// If connected, send an update
+     //double degrees = heading * (180.0 / PI);
+     
 		if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d,scan=%d\n", x, y, heading, pingRange0, turetHeading,turetScan);
 
 		// If scan enabled, move the turet left and right

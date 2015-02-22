@@ -1,3 +1,7 @@
+/**
+* Responsible for recieving commands from the front end, then sending them to the robot
+* Also serves as webserver for the front end
+*/
 
 // https://github.com/eelcocramer/node-bluetooth-serial-port
 //
@@ -137,7 +141,9 @@ function keyPressEvent(ch, key) {
     blueTooth.sendCommand(key.name);
   }
 }
-
+/**
+* Wrapper for node's bluetooth serial from https://github.com/eelcocramer/node-bluetooth-serial-port
+*/
 function BlueTooth() {
 
     var self = this,
@@ -158,6 +164,13 @@ function BlueTooth() {
     self.connect = function() {
         
         console.log('bluetooth connecting..');
+        
+/*
+        if ( btSerial.isOpen() ) {
+            
+            btSerial.close();
+        }
+*/
         // Starts searching for bluetooth devices. When a device is found a 'found' event will be emitted.
         btSerial.inquire();
     }
@@ -270,9 +283,12 @@ function initEureca() {
         
         blueTooth.connect();
 
-    } 
-     
+    }    
     //functions under "exports" namespace will be exposed to client side
+    eurecaServer.exports.sendCommand = function (command) {
+        console.log('Eureca sendCommand ' + command);
+        blueTooth.sendCommand(command);
+    }
     eurecaServer.exports.up = function () {
         console.log('Eureca up');
         blueTooth.sendCommand(commandKeyMatrix.up+ " 60");

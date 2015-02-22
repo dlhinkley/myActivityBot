@@ -39,6 +39,8 @@
         <input type="button" name="slow" value="slow" onclick="server.slow()">
         <input type="button" name="scan" value="scan" onclick="server.scan()">
         <p>
+        Command: <input type="text" name="command" value="" id="command" size="20"><input type="button" id="commandButton" value="Send" onclick="sendCommand()">
+        <p>
         <canvas id="routeCanvas" width="400" height="400"
 style="border:1px solid #d3d3d3;">
 Your browser does not support the HTML5 canvas tag.</canvas>    
@@ -75,7 +77,7 @@ Your browser does not support the HTML5 canvas tag.</canvas>
              client.exports.heading = function (text)
             {
                 console.log("heading text=" + text);
-                $('#heading').val(text);
+                $('#heading').val(text * Math.PI / 180);
                 drawLocation(x,y);
             }             
              client.exports.turet = function (text)
@@ -100,6 +102,11 @@ Your browser does not support the HTML5 canvas tag.</canvas>
                 ctx.beginPath();
                 ctx.arc(xin,yin,5,0,2*Math.PI);
                 ctx.stroke();
+            }
+            function sendCommand() {
+                
+                var command = $('#command').val();
+                server.sendCommand(command);
             }
         </script>
     </body>
