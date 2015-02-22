@@ -45,7 +45,9 @@ function Robot(id,room,x,y) {
     	
     	var parts = command.split(' ');
     	var cmd = parts[0].trim();
-    	var val = parts[1].trim();
+    	var val = parseInt( parts[1].trim() );
+    	
+    	
     	
     	if ( cmd == 'up' ) {
         	
@@ -122,7 +124,7 @@ function Robot(id,room,x,y) {
 	        }	
         
         
-		if ( ! isHitWall( self.x, self.y, newDeg )  ) {
+		if ( ! isHitWall( x, y, newDeg )  ) {
 		
 			loc.heading.deg = newDeg;
 		}        
@@ -160,10 +162,10 @@ function Robot(id,room,x,y) {
 		
 		console.log('moveBack moveX=' + moveX + ' moveY=' + moveY);
 		
-		if ( ! isHitWall(self.x - moveX , self.y - moveY, loc.heading.deg ) ) {
+		if ( ! isHitWall(x - moveX , y - moveY, loc.heading.deg ) ) {
 
-			self.x -= moveX;
-			self.y -= moveY;
+			x -= moveX;
+			y -= moveY;
 		}
 		render();
 	};
@@ -173,8 +175,8 @@ function Robot(id,room,x,y) {
 		//var moveY = Math.round(speed * distance * Math.cos(loc.heading.deg * Math.PI / 180));
 		//var moveX = Math.round(speed * distance * Math.sin(loc.heading.deg * Math.PI / 180));
 	
-			var x10 = self.x
-			var y10 = self.y
+			var x10 = x
+			var y10 = y
 
 			var halfHeight = speed * distance 
 			var halfWidth  = 0
@@ -192,10 +194,10 @@ function Robot(id,room,x,y) {
 			
 		console.log('moveForward moveX=' + moveX + ' moveY=' + moveY);	
 		
-		if ( ! isHitWall(self.x - moveX, self.y - moveY, loc.heading.deg ) ) {
+		if ( ! isHitWall(x - moveX, y - moveY, loc.heading.deg ) ) {
 		
-			self.x -= moveX;
-			self.y -= moveY;
+			x -= moveX;
+			y -= moveY;
 		}
 		
 		render();
@@ -219,9 +221,9 @@ function Robot(id,room,x,y) {
 		
 		var dim = calcCorners(x,y, deg);
 		
-		self.hit = room.isHitWall(dim);
+		var hit = room.isHitWall(dim);
 		
-		return self.hit;
+		return hit;
 	}
 	function calcCorners(x,y, deg) {
 		
@@ -281,12 +283,12 @@ function Robot(id,room,x,y) {
 		
     		// TL calculation
     		//
-    		calcCorners(self.x, self.y, loc.heading.deg);
+    		calcCorners(x, y, loc.heading.deg);
     			    	    
     	    rotate(div,loc.heading.deg);
     	    
-    	    div.style.top = self.y - (height / 2);
-    	    div.style.left = self.x - (width / 2);
+    	    div.style.top = y - (height / 2);
+    	    div.style.left = x - (width / 2);
     	    
     			
     		document.getElementById('tl').innerHTML = 'x=' + Math.round(loc.dim.tl.x) + '<br>y=' + Math.round(loc.dim.tl.y);
@@ -294,16 +296,16 @@ function Robot(id,room,x,y) {
     		document.getElementById('br').innerHTML = 'x=' + Math.round(loc.dim.br.x) + '<br>y=' + Math.round(loc.dim.br.y);
     		document.getElementById('bl').innerHTML = 'x=' + Math.round(loc.dim.bl.x) + '<br>y=' + Math.round(loc.dim.bl.y);
     
-    		document.getElementById('coord').innerHTML = 'x=' + Math.round( self.x ) + ' y=' + Math.round( self.y );
+    		document.getElementById('coord').innerHTML = 'x=' + Math.round( x ) + ' y=' + Math.round( y );
     		
     		var pointADiv = document.getElementById('pointA');
     		var pointBDiv = document.getElementById('pointB');
     		
-    		pointADiv.style.left = self.x - 10;
-    		pointADiv.style.top = self.y ;
+    		pointADiv.style.left = x - 10;
+    		pointADiv.style.top = y ;
     	    
-    		pointBDiv.style.left = self.x - 10;
-    		pointBDiv.style.top = self.y;
+    		pointBDiv.style.left = x - 10;
+    		pointBDiv.style.top = y;
     	    
     		
     		var frontADiv = document.getElementById('frontA');
