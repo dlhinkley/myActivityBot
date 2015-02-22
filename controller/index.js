@@ -21,13 +21,11 @@ var eurecaClient = null;
 var turet = null;
 
 var commandKeyMatrix = {
-                        'up': 'up',
-                        'left': 'left',
-                        'right': 'right',
-                        'down': 'down',
-                        'space': 's', // slow
+                        'up': 'rampUp',
+                        'left': 'rampLeft',
+                        'right': 'rampRight',
+                        'down': 'rampDown',
                         'slow': 'slow', // slow
-                        'x': 'x', // stop
                         'stop': 'stop', // stop
                         'q': 'q', // 0
                         'w': 'w', // 22
@@ -310,17 +308,17 @@ function initEureca() {
     eurecaServer.exports.turetLeft = function () {
         console.log('Eureca turet left');
         turet.left();
-        blueTooth.sendCommand( turet.getCommand() + " 60");
+        blueTooth.sendCommand( turet.getCommand());
     }     
     eurecaServer.exports.turetRight = function () {
         console.log('Eureca turet right');
         turet.right();
-        blueTooth.sendCommand( turet.getCommand() + " 60");
+        blueTooth.sendCommand( turet.getCommand());
     }     
     eurecaServer.exports.turetStraight = function () {
         console.log('Eureca turet straight');
         turet.straight();
-        blueTooth.sendCommand( turet.getCommand() + " 60");
+        blueTooth.sendCommand( turet.getCommand() );
     }     
     
     
@@ -368,7 +366,7 @@ function Turet() {
     }
     self.getCommand = function() {
         
-        return self.directions[ self.pointer ].cmd;
+        return "turet " + self.directions[ self.pointer ].deg;
     }
     self.left = function() {
         
