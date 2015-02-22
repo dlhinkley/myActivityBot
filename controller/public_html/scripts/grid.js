@@ -1,4 +1,5 @@
 
+'use strict';
 function GridPaper(width,height) {
 	
 	var margin = 40; 

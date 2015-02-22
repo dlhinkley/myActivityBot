@@ -1,4 +1,5 @@
 
+'use strict';
 // http://www.helixsoft.nl/articles/circle/sincos.htm
 
 // http://forums.coronalabs.com/topic/39094-code-for-rotated-rectangle-collision-detection/
@@ -64,22 +65,22 @@ robot.setSize(25, 50);
 
 function pushForward() {
   
-  robot.moveForward(1);
+  robot.setCommand('up 1');
 }
 
 function pushBackward() {
 
-  robot.moveBack(1);
+  robot.setCommand('down 1');
 }
 
 function turnLeft() {
 
-  robot.turn(-10);
+  robot.setCommand('left 10');
 }
 
 function turnRight() {
 
-  robot.turn(10);
+  robot.setCommand('right 10');
 }
 
 
@@ -95,8 +96,8 @@ function drive() {
 	
 	console.log('drive start');
 	
-	robot.moveForward(5);
-	var dist = robot.getWallDistance();
+	robot.setCommand('up 5');
+	var dist = robot.getCommand().ping;
 	
 	if ( robot.hit  ) {
 	
@@ -146,26 +147,26 @@ function Navigator() {
 	
 		console.log('Robot.driveToPoint destPoint=', destPoint);
 		
-		var robotLocPoint = Vector.create([robot.x,robot.y]);
-		var robotProjectedPoint = calcPoint(robot.x, robot.y,robot.getHeadingDeg(), 200);
+		var robotLocPoint = Vector.create([robot.getCommand().x,robot.getCommand().y]);
+		var robotProjectedPoint = calcPoint(robot.getCommand().x, robot.getCommand().y,robot.getCommand().heading, 200);
 		
 		var robotProjectedLine = Line.create(robotLocPoint,robotProjectedPoint);
 		
 		
 		// Get angle of line
-		var routeLine = Line.create( destPoint, Vector.create([robot.x, robot.y]) );
+		var routeLine = Line.create( destPoint, Vector.create([robot.getCommand().x, robot.getCommand().y]) );
 		
 		var angleDeg = 180 + angleBetween2Lines(routeLine, robotProjectedLine );
 		
 		console.log('driveToPoint angleDeg=' + angleDeg );
 		
-		robot.turn(angleDeg);
+		robot.setCommand('right ' + angleDeg);
 		
 		var driveLen = routeLine.length();
 		
 		console.log('driveToPoint driveLen=' + driveLen );
 		
-		robot.moveForward( driveLen );
+		robot.setCommand('up ' +  driveLen );
 		//var angleDeg = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
 /*
 		var lineAngle = routeLine.angle();

@@ -1,11 +1,11 @@
 
+'use strict';
 
 
 function Robot(id,room,x,y) {
 
 	var self = this;
-	self.x = x;
-	self.y = y;
+
 		
 	var loc = {
 				"heading": {
@@ -41,10 +41,44 @@ function Robot(id,room,x,y) {
 		
 		render();
 	}
-	self.getHeadingDeg = function() {
-		
-		return loc.heading.deg;
+	self.sendCommand = function(command) {
+    	
+    	var parts = command.split(' ');
+    	var cmd = parts[0].trim();
+    	var val = parts[1].trim();
+    	
+    	if ( cmd == 'up' ) {
+        	
+        	moveForward(val);
+    	}
+    	else if ( cmd == 'down' ) {
+        	
+        	moveBack(val);
+    	}
+    	else if ( cmd == 'left' ) {
+        	
+        	turn(val);
+    	}
+    	else if ( cmd == 'right' ) {
+        	
+        	turn(val);
+    	}
+    	
 	}
+	self.getCommand = function() {
+    	var turetHeading = 0;
+    	var turetScan = 0;
+    	//var pingRange0 = room.getWallDistance(loc.dim.point.x, loc.dim.point.y, loc.heading.deg);
+    	var pingRange0 = room.getWallDistance(x, y, loc.heading.deg);
+    	
+		var command = 'command=update,x=' + x + ',y=' + y + ',heading=' + loc.heading.deg + ',ping=' + pingRange0 + ',turet=' + turetHeading + ',scan=' + turetScan;
+		
+		console.log('Robot.getCommand command=' + command);
+		
+		return new Command(command);
+
+	}
+
 	self.setSize = function(w,h) {
 		
 		width = w;
@@ -57,25 +91,23 @@ function Robot(id,room,x,y) {
 		}
 		render();
 	}
-	self.setPosition = function(x,y) {
+	self.setPosition = function(xIn,yIn) {
 		
-		self.x = x;
-		self.y = y;
+		x = xIn;
+		y = yIn;
 		render();
 	}
 	/**
 	* Returns the x, y location of the front point of the robot
 	*/
+/*
 	self.getPoint = function() {
 		
 		return loc.dim.point;
 	}
-	this.getWallDistance = function() {
-		
-		
-		return room.getWallDistance(loc.dim.point.x, loc.dim.point.y, loc.heading.deg);
-	}
-	this.turn = function(deg) {
+*/
+
+	function turn(deg) {
 		
 		
 		var newDeg = loc.heading.deg + deg;
@@ -103,7 +135,7 @@ function Robot(id,room,x,y) {
 		
         render();
 	};
-	this.moveBack = function(distance) {
+	function  moveBack(distance) {
 
         //var moveY = (speed * distance * loc.heading.cos);
 		//var moveX = (speed * distance * loc.heading.sin);
@@ -136,7 +168,7 @@ function Robot(id,room,x,y) {
 		render();
 	};
 
-	this.moveForward = function(distance) {
+	 function moveForward(distance) {
 			
 		//var moveY = Math.round(speed * distance * Math.cos(loc.heading.deg * Math.PI / 180));
 		//var moveX = Math.round(speed * distance * Math.sin(loc.heading.deg * Math.PI / 180));
@@ -170,7 +202,7 @@ function Robot(id,room,x,y) {
 	};
 	var rotation = 0;
 
-	function rotate(id,degrees) {
+	function rotate(degrees) {
 	
 	    $(id).css({'-webkit-transform' : 'rotate('+ degrees +'deg)',
 	                 '-moz-transform' : 'rotate('+ degrees +'deg)',

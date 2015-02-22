@@ -1,3 +1,5 @@
+'use strict';
+
 /**
 * Responsible for recieving commands from the front end, then sending them to the robot
 * Also serves as webserver for the front end
@@ -10,6 +12,8 @@ var received = '';
 var rxIn = '';
 var prevCommand = '';
 var eurecaClient = null;
+
+var Command = require('./public_html/scripts/command.js');
 
 // https://github.com/TooTallNate/keypress
 /*
@@ -69,45 +73,19 @@ function receivedText(text) {
 }
 function processUpdateCommand(text) {
     
-    text = text.trim();
+    var cmd = new Command(text);
     
-    var commandValues = text.split(',');
-    //console.log("commandValues=",commandValues);
     
-    for (var m = 0; m < commandValues.length; m++ ) {
-        
-        //console.log("commandValues[m]=" + commandValues[m] + ' m=' + m);
-        var parts = commandValues[m].split('=');
-        
-        //console.log('parts=',parts);
-        
-        var command = parts[0];
-        var value = parts[1];
-        
-        //console.log('command=' + command + ' value=' + value);
-        
-        if ( command === 'x' ) {
-            
-            eurecaClient.setX(value);
-        }
-        else if ( command === 'y' ) {
-            
-            eurecaClient.setY(value);
-        }
-        else if ( command === 'heading' ) {
-            
-            eurecaClient.heading(value);
-        }
-        else if ( command === 'ping' ) {
-            
-            eurecaClient.ping(value);
-        }
-        else if ( command === 'turet' ) {
-            
-            turet.setDirection(value);
-            eurecaClient.turet(value);
-        }
-     }
+    eurecaClient.setX(cmd.x);
+    
+    eurecaClient.setY(cmd.y);
+    
+    eurecaClient.heading(cmd.heading);
+    
+    eurecaClient.ping(cmd.ping);
+    
+    turet.setDirection(cmd.turet);
+    eurecaClient.turet(cmd.turet);
     
 }
 function keyPressEvent(ch, key) {
@@ -344,7 +322,7 @@ function initEureca() {
 }
 function Turet() {
     
-    self = this;
+    var self = this;
     self.direction = 0;
     
     self.directions = [

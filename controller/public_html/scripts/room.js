@@ -1,3 +1,4 @@
+'use strict';
 function Room(id,walls,canvas) {
 
     var walls, wallCanvas, roomDim;

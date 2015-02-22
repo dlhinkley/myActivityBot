@@ -1,3 +1,4 @@
+'use strict';
 /**
 * object for searchin for wall
 */

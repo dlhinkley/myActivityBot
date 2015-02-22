@@ -1,4 +1,17 @@
 
+QUnit.test("Command", function(assert) {
+    
+    var text = "command=update,x=100.000,y=250.000,heading=180.00,ping=15,turet=25,scan=65\n";
+    
+    var cmd = new Command(text);
+    
+    assert.equal( cmd.x, 100, 'x');
+    assert.equal( cmd.y, 250, 'x');
+    assert.equal( cmd.heading, 180, 'x');
+    assert.equal( cmd.ping, 15, 'x');
+    assert.equal( cmd.turet, 25, 'x');
+    
+});
 
 
 QUnit.test( "room.isHitWall right on", function( assert ) {

@@ -1,3 +1,5 @@
+'use strict';
+
 	/**
 	* Map Grid object
 	*/

@@ -26,13 +26,13 @@ function MapRoom(robot, canvas) {
 			
 			turnDeg += 10;
 			
-			robot.turn(10);
+			robot.sendCommand('right 10');
 		
-			wallDist = robot.getWallDistance();
+			wallDist = robot.getCommand().ping;
 			console.log('wallDist = ' + wallDist);	
 			
 			if ( wallDist !== null ) {
-                point = calcPoint(robot.getPoint().x ,robot.getPoint().y, wallDist, turnDeg);
+                point = calcPoint(robot.getCommand().x ,robot.getCommand().y, wallDist, turnDeg);
     			
     			// Save wall location
     			walls.addLine( point );
@@ -153,8 +153,8 @@ function MapRoom(robot, canvas) {
 	function createMapGrid() {
     	
     	// Start at robot position, go right
-    	var centerX = robot.x;
-    	var centerY = robot.y;
+    	var centerX = robot.getCommand().x;
+    	var centerY = robot.getCommand().y;
     	 
         mapGrid = new MapGrid(gridSize);
     	

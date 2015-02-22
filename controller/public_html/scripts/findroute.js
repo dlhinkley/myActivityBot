@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Given the begining, ending cell and map grid, return the route to get there
  * Based on Wavefront algorithum here: http://www.societyofrobots.com/programming_wavefront.shtml
