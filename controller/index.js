@@ -31,20 +31,7 @@ var commandKeyMatrix = {
                         'down': 'rampDown',
                         'slow': 'slow', // slow
                         'stop': 'stop', // stop
-                        'q': 'q', // 0
-                        'w': 'w', // 22
-                        'e': 'e', // 45
-                        'r': 'r', // 67
-                        't': 't', // 90 degree
-                        'y': 'y', // 112
-                        'u': 'u', // 135
-                        'i': 'i', // 157
-                        'o': 'o', // 180
-                        'p': 'p', // ping
                         'ping': 'p', // ping
-                        'c': 'c', // coordinates
-                        'coords': 'c', // coordinates
-                        //'n': 'n', // Turet scan 
                         'scan': 'scan', // Turet scan 
 };
 function init() {
