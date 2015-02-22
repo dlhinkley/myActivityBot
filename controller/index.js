@@ -21,14 +21,14 @@ var eurecaClient = null;
 var turet = null;
 
 var commandKeyMatrix = {
-                        'up': 'k',
-                        'left': 'l',
-                        'right': 'h',
-                        'down': 'j',
+                        'up': 'up',
+                        'left': 'left',
+                        'right': 'right',
+                        'down': 'down',
                         'space': 's', // slow
-                        'slow': 's', // slow
+                        'slow': 'slow', // slow
                         'x': 'x', // stop
-                        'stop': 'x', // stop
+                        'stop': 'stop', // stop
                         'q': 'q', // 0
                         'w': 'w', // 22
                         'e': 'e', // 45
@@ -42,8 +42,8 @@ var commandKeyMatrix = {
                         'ping': 'p', // ping
                         'c': 'c', // coordinates
                         'coords': 'c', // coordinates
-                        'n': 'n', // Turet scan 
-                        'scan': 'n', // Turet scan 
+                        //'n': 'n', // Turet scan 
+                        'scan': 'scan', // Turet scan 
 };
 function init() {
 
@@ -75,7 +75,8 @@ function receivedText(text) {
        
        console.log('eureca coords text=' + text);
        eurecaClient.coords(text);
-   }    
+   }
+   
 }
 function processUpdateCommand(text) {
     
@@ -164,8 +165,10 @@ function BlueTooth() {
     }
     self.sendCommand = function (command) {
     
+       console.log('BlueTooth.sendCommand command=' + command);
+       
        // Send command to robot
-        btSerial.write(new Buffer(command, 'utf-8'), function(err, bytesWritten) {
+        btSerial.write(new Buffer(command + "\n", 'utf-8'), function(err, bytesWritten) {
         
             if (err)  { 
                 console.log(err);
@@ -188,7 +191,7 @@ function BlueTooth() {
         
         for (var m = 0; m < out.length; m++) {
             
-            //console.log('data m=' + m + ' char=' + out.charAt(m));
+            ///console.log('data m=' + m + ' char=' + out.charAt(m));
             
             if ( out.charAt(m) === '\n' ) {
                 
@@ -274,50 +277,50 @@ function initEureca() {
     //functions under "exports" namespace will be exposed to client side
     eurecaServer.exports.up = function () {
         console.log('Eureca up');
-        blueTooth.sendCommand(commandKeyMatrix.up);
+        blueTooth.sendCommand(commandKeyMatrix.up+ " 60");
     }
     eurecaServer.exports.left = function () {
         console.log('Eureca left');
-        blueTooth.sendCommand(commandKeyMatrix.left);
+        blueTooth.sendCommand(commandKeyMatrix.left+ " 60");
     } 
     eurecaServer.exports.right = function () {
         console.log('Eureca right');
-        blueTooth.sendCommand(commandKeyMatrix.right);
+        blueTooth.sendCommand(commandKeyMatrix.right+ " 60");
     } 
     eurecaServer.exports.down = function () {
         console.log('Eureca down');
-        blueTooth.sendCommand(commandKeyMatrix.down);
+        blueTooth.sendCommand(commandKeyMatrix.down+ " 60");
     }     
     eurecaServer.exports.stop = function () {
         console.log('Eureca stop');
-        blueTooth.sendCommand(commandKeyMatrix.stop);
+        blueTooth.sendCommand(commandKeyMatrix.stop+ " 60");
     }     
     eurecaServer.exports.slow = function () {
         console.log('Eureca slow');
-        blueTooth.sendCommand(commandKeyMatrix.slow);
+        blueTooth.sendCommand(commandKeyMatrix.slow+ " 60");
     }     
     eurecaServer.exports.ping = function () {
         console.log('Eureca ping');
-        blueTooth.sendCommand(commandKeyMatrix.ping);
+        blueTooth.sendCommand(commandKeyMatrix.ping+ " 60");
     }     
     eurecaServer.exports.scan = function () {
         console.log('Eureca turet scan');
-        blueTooth.sendCommand(commandKeyMatrix.scan);
+        blueTooth.sendCommand(commandKeyMatrix.scan + " 60");
     }     
     eurecaServer.exports.turetLeft = function () {
         console.log('Eureca turet left');
         turet.left();
-        blueTooth.sendCommand( turet.getCommand() );
+        blueTooth.sendCommand( turet.getCommand() + " 60");
     }     
     eurecaServer.exports.turetRight = function () {
         console.log('Eureca turet right');
         turet.right();
-        blueTooth.sendCommand( turet.getCommand() );
+        blueTooth.sendCommand( turet.getCommand() + " 60");
     }     
     eurecaServer.exports.turetStraight = function () {
         console.log('Eureca turet straight');
         turet.straight();
-        blueTooth.sendCommand( turet.getCommand() );
+        blueTooth.sendCommand( turet.getCommand() + " 60");
     }     
     
     

@@ -48,7 +48,7 @@
   int TUR = 17; // Turret pin
   int PING = 16; // Ping pin
   int correction = -190; // turret correction
-
+  
 
       
 // The directions durring a scan
@@ -69,12 +69,13 @@ static volatile int pingRange0 = 0, turetHeading = 0, connected = 0, turetScan =
 void getTicks();
 void stopIfWall();
 void positionTuret(char);
+int isCmd(char[],char[]);
 
 fdserial *blue;
 
 int main()                              // Main - execution begins!
 {
-  
+
   TDEG0 =  0 + correction,
   TDEG22 = 220 + correction,
   TDEG45 = 450 + correction,
@@ -129,12 +130,46 @@ int main()                              // Main - execution begins!
     //{
      // int button = sirc_button(IR);      // check for remote key press
       
+     // Text manuver from: http://learn.parallax.com/activitybot/text-file-maneuver-list
+     //
      getTicks();  // Check for ticks
-     
      if (fdserial_rxReady(blue) != 0) { // Non blocking check for data in the input buffer
       connected = 1;
       
-      char c = fdserial_rxChar(blue);
+
+			char sbuf[20]; // A Buffer long enough to hold the longest line  may send.
+			int count = 0;
+			while (count < 20) {
+				sbuf[count] = readChar(blue);
+				if (sbuf[count] == '\r' || sbuf[count] == '\n') // Read until return
+					break;
+				count++;
+			}
+   
+      char cmdbuf[10];                             // Command buffer
+      char valbuf[4];                              // Text value buffer
+      int  val;   
+      int i = 0;                                 // Declare index variable
+      // Parse command
+      while(!isalpha(sbuf[i])) i++;             // Find 1st command char
+      
+      sscan(&sbuf[i], "%s", cmdbuf);            // Command -> buffer
+      
+      i += strlen(cmdbuf);                     // Idx up by command char count
+      
+      //if(!strcmp(cmdbuf, "end")) break;        // If command is end, break
+  
+      // Parse distance argument
+      while(!isdigit(sbuf[i])) i++;             // Find 1st digit after command
+      
+      sscan(&sbuf[i], "%s", valbuf);            // Value -> buffer
+      
+      i += strlen(valbuf);                     // Idx up by value char count
+      
+      val = atoi(valbuf);                      // Convert string to value   
+   
+   
+      //writeLine(blue,"Got it\n");
       
   	   //drive_getTicks(&ticksLeftIn, &ticksRightIn);
        //x = x + ticksLeftIn;
@@ -161,36 +196,8 @@ int main()                              // Main - execution begins!
         //if(c == LEFT) print("Left turn");    
         //if(c == RIGHT) print("Right turn");
         //if(c == STOP) print("Stop");
-  
-        if ( c == UP ) {
-            drive_rampStep(128, 128);   // Forward
-        }
-        else if (c == DOWN ) {
-            drive_rampStep(-128, -128); // Backward
-        }
-        else if (c == LEFT ) {
-            drive_rampStep(-128, 128); // Left turn
-        }
-        else if (c == RIGHT ) {
-            drive_rampStep(128, -128); // Right turn 
-        }
-        else if (c == SLOW ) {
-            drive_rampStep(0, 0);        // Slow
-        }
-        else if (c == STOP ) {
-            drive_speed(0, 0);        // Stop
-        }
-       
-        else if (c == KPING ) {
-            writeDec(blue, pingRange0);
-            writeChar(blue,'\n');
-        }
-
-        else if (c == KBEARNG ) {
-            writeDec(blue, heading);
-            writeChar(blue,'\n');
-        }        
-        else if ( c == KSCAN ) {
+ 
+        if ( strcmp(cmdbuf,"scan") == 0) {
          
           // Toggle the scan status
           if ( turetScan == 0 ) {
@@ -200,56 +207,107 @@ int main()                              // Main - execution begins!
           else {
             
             turetScan = 0;
-            positionTuret(KDEG90); 
+            //positionTuret(KDEG90); 
           }                         
         }
+        else if ( strcmp(cmdbuf,"up") == 0 ) {
+            //drive_rampStep(128, 128);   // Forward
+            drive_goto(val,val);
+        }
+        else if ( strcmp(cmdbuf,"down") == 0 ) {
+            //drive_rampStep(-128, -128); // Backward
+            drive_goto(-val,-val);
+        }
+        else if ( strcmp(cmdbuf,"left") == 0  ) {
+            //drive_rampStep(-128, 128); // Left turn
+            drive_goto(-val,val);
+        }
+        else if ( strcmp(cmdbuf,"right") == 0  ) {
+            //drive_rampStep(128, -128); // Right turn 
+            drive_goto(val,-val);
+        }
+        else if ( strcmp(cmdbuf,"slow") == 0 ) {
+            //drive_rampStep(0, 0);        // Slow
+        }
+        else if ( strcmp(cmdbuf,"stop") == 0  ) {
+            drive_speed(0, 0);        // Stop
+        }
+       /*
+        else if (strcmp(buf,KPING) ) {
+            writeDec(blue, pingRange0);
+            writeChar(blue,'\n');
+        }
+
+        else if (strcmp(buf,KBEARNG) ) {
+            writeDec(blue, heading);
+            writeChar(blue,'\n');
+        }        
+*/
         else {
           
-          positionTuret(c);
+          //positionTuret(buf);
         }                    
      }                       
   }            
 }
+int isCmd(char  *buf, char  *cmd) {
  
-void positionTuret(char c) {
+   int match = 0;
+   if ( buf[0] == '!' &&  cmd[0] == '!'  ) {
+    
+      match = 1;
+      int m = 0;
+      while ( m < sizeof(buf) ) {
+        
+          if ( buf[m] != cmd[m] ) {
+            
+            match = 0;
+          }      
+      }    
+   }  
+   return match; 
   
-        if (c == KDEG0 ) {
+}  
+  
+void positionTuret(char inBuff) {
+  /*
+        if (strcmp(inBuff,KDEG0) == 0 ) {
             servo_angle(TUR, TDEG0);
             turetHeading  = 0;
         }
-        else if (c == KDEG22 ) {
+        else if (strcmp(inBuff,KDEG22) == 0 ) {
             servo_angle(TUR, TDEG22); 
             turetHeading  = 22;
         }
-        else if (c == KDEG45 ) {
+        else if (strcmp(inBuff,KDEG45) == 0 ) {
             servo_angle(TUR, TDEG45);
             turetHeading  = 45;
         }
-        else if (c == KDEG67 ) {
+        else if (strcmp(inBuff,KDEG67) == 0 ) {
             servo_angle(TUR, TDEG67);  
             turetHeading  = 067;
         }
-        else if (c == KDEG90 ) {
+        else if (strcmp(inBuff,KDEG90) == 0 ) {
             servo_angle(TUR, TDEG90);
             turetHeading  = 90;
         }
-        else if (c == KDEG112 ) {
+        else if (strcmp(inBuff,KDEG112) == 0 ) {
             servo_angle(TUR, TDEG112); 
             turetHeading  = 112;
         }
-        else if (c == KDEG135 ) {
+        else if (strcmp(inBuff,KDEG135) == 0 ) {
             servo_angle(TUR, TDEG135);
             turetHeading  = 135;
         }
-        else if (c == KDEG157 ) {
+        else if (strcmp(inBuff,KDEG157) == 0 ) {
             servo_angle(TUR, TDEG157); 
             turetHeading  = 157;
         }
-        else if (c == KDEG180 ) {
+        else if (strcmp(inBuff,KDEG180) == 0 ) {
             servo_angle(TUR, TDEG180);
             turetHeading  = 180;
         } 
-  
+  */
 }  
 
 void getTicks(void) {
@@ -294,7 +352,7 @@ void pollPingSensors(void *par) {
     }     
 	
     
-    pause(250);                               // Wait 1 second
+    pause(500);                               // Wait 1 second
     if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d,scan=%d\n", x, y, heading, pingRange0, turetHeading,turetScan);
 
     // If scan enabled
@@ -306,8 +364,8 @@ void pollPingSensors(void *par) {
        // Change the position of the turet
        int dir = turetDir[ scanPtr ];
        // dir 135
-       positionTuret(dir); 
-       pause(250); // Pause a second to make sure the turet is positioned
+       //positionTuret(dir); 
+       pause(500); // Pause a second to make sure the turet is positioned
        
        
        // If the ptr is greater than the number of positions, go the other way
