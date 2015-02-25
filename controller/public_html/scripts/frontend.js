@@ -36,12 +36,9 @@ var y = 0;
  client.exports.heading = function (text)
 {
     //console.log("heading text=" + text);
-    var deg = text - 22.5
-			if (deg < 0)
-                deg += 360;
 
-    $('#heading').val(deg);
-    robot.command.heading = parseInt(deg);
+    $('#heading').val(text);
+    robot.command.heading = parseInt(text);
 
     drawLocation(x,y);
 }             

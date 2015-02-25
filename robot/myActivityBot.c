@@ -230,7 +230,6 @@ void calcCoordinates(void) {
 		}
 	}
    degHeading = heading * (180 / PI);
-   degHeading += 22.5;
   if (degHeading < 0) degHeading += 360;
 
 }
