@@ -32,7 +32,7 @@ int correction = -190; // turret correction
 int ticksLeft, ticksRight, ticksLeftOld, ticksRightOld;
 static double trackWidth, distancePerCount;
 
-static volatile double heading = 0.0, x = 0.0, y = 0.0;
+static volatile double heading = 0.0, x = 0.0, y = 0.0, degHeading;
 static volatile int pingRange0 = 0, turetHeading = 0, connected = 0, turetScan = 0;
 
 
@@ -229,6 +229,10 @@ void calcCoordinates(void) {
 			heading += 2.0 * PI;
 		}
 	}
+   degHeading = heading * (180 / PI);
+   degHeading += 22.5;
+  if (degHeading < 0) degHeading += 360;
+
 }
 /**
  * Continously poll the ping sensors setting the global variable pingRange0.
@@ -260,7 +264,7 @@ void pollPingSensors(void *par) {
 		// If connected, send an update
      //double degrees = heading * (180.0 / PI);
      
-		if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d,scan=%d\n", x, y, heading, pingRange0, turetHeading,turetScan);
+		if ( connected == 1 ) dprint(blue, "command=update,x=%.3f,y=%.3f,heading=%.3f,ping=%d,turet=%d,scan=%d\n", x, y, degHeading, pingRange0, turetHeading,turetScan);
 
 		// If scan enabled, move the turet left and right
 		if ( turetScan == 1 ) {
