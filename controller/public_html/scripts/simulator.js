@@ -57,7 +57,7 @@ var walls = [
         
 var room  		= new Room("room", walls,canvas);
 var gridPaper  	= new GridPaper(500,400);
-var robot 		= new Robot("robot",room);
+var robot 		= new SimulatedRobot("robot",room);
 robot.setPosition(200,200);
 robot.setSize(25, 50);
 
@@ -145,7 +145,7 @@ function Navigator() {
 	*/
 	self.driveToPoint = function(robot, destPoint) {
 	
-		console.log('Robot.driveToPoint destPoint=', destPoint);
+		console.log('SimulatedRobot.driveToPoint destPoint=', destPoint);
 		
 		var robotLocPoint = Vector.create([robot.getCommand().x,robot.getCommand().y]);
 		var robotProjectedPoint = calcPoint(robot.getCommand().x, robot.getCommand().y,robot.getCommand().heading, 200);

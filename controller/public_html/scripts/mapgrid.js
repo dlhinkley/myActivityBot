@@ -1,7 +1,7 @@
 'use strict';
 
 	/**
-	* Map Grid object
+	* Storage and accessors for a grid of map cells.
 	*/
     function MapGrid( gridSizeIn, maxX, maxY) {
         

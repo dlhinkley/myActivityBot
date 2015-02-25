@@ -2,7 +2,7 @@
 'use strict';
 
 
-function Robot(id,room,x,y) {
+function SimulatedRobot(id,room,x,y) {
 
 	var self = this;
 
@@ -75,7 +75,7 @@ function Robot(id,room,x,y) {
     	
 		var command = 'command=update,x=' + x + ',y=' + y + ',heading=' + loc.heading.deg + ',ping=' + pingRange0 + ',turet=' + turetHeading + ',scan=' + turetScan;
 		
-		console.log('Robot.getCommand command=' + command);
+		console.log('SimulatedRobot.getCommand command=' + command);
 		
 		return new Command(command);
 
@@ -133,7 +133,7 @@ function Robot(id,room,x,y) {
 		loc.heading.cos = Math.cos(loc.heading.deg * Math.PI / 180);
 		
 		
-		console.log('Robot.turn loc.heading=',loc.heading);
+		console.log('SimulatedRobot.turn loc.heading=',loc.heading);
 		
         render();
 	};

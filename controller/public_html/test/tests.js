@@ -280,14 +280,14 @@ QUnit.test( "mapRoom", function( assert ) {
 		g.line(  g.point( 0,     height),       g.point(0,     0)			),  // bottom wall
 ];	
     var room    = new Room(null,walls, null);
-    var robot   = new Robot(null,room);
+    var robot   = new SimulatedRobot(null,room);
     var mapRoom = new MapRoom(robot,null);
     
     robot.setPosition(200,200);
     robot.setSize(25, 50);
 
     assert.ok( typeof room     === "object", "Room defined");
-    assert.ok( typeof robot    === "object", "Robot defined");
+    assert.ok( typeof robot    === "object", "SimulatedRobot defined");
     assert.ok( typeof mapRoom  === "object", "MapRoom defined");
     
     while ( ! mapRoom.complete ) {
@@ -466,7 +466,7 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
     ];	
             
     var room  		= new Room(null, walls,null);
-    var robot 		= new Robot(null,room);
+    var robot 		= new SimulatedRobot(null,room);
     robot.setPosition(100,100);
     robot.setSize(25, 50);
     
@@ -486,8 +486,8 @@ QUnit.test( "maproom.calcScanRoute 200x200", function( assert ) {
 	
 	console.log('robotCell=',robotCell);
 	
-	assert.equal( robotCell.x , 100, "Robot cell x");
-	assert.equal( robotCell.y , 100, "Robot cell y");
+	assert.equal( robotCell.x , 100, "SimulatedRobot cell x");
+	assert.equal( robotCell.y , 100, "SimulatedRobot cell y");
 	
 	// Cells around robot
 	var cellEast = mapGrid.cellEast(robotCell);
@@ -562,7 +562,7 @@ QUnit.test( "maproom.calcScanRoute 400x500", function( assert ) {
     ];		
             
     var room  		= new Room(null, walls,null);
-    var robot 		= new Robot(null,room);
+    var robot 		= new SimulatedRobot(null,room);
     robot.setPosition(200,200);
     robot.setSize(25, 50);
 

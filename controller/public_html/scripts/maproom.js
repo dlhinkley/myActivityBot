@@ -19,17 +19,19 @@ function MapRoom(robot, canvas) {
 	* Scans room from initial position
 	*/
 	self.scanInitial = function() {
+	
+		console.log('MapRoom.scanInitial start');	
 		
 		var point, wallDist = null;
 
 		if ( turnDeg <= 360 ) {
 			
-			turnDeg += 10;
+			turnDeg += 30;
 			
-			robot.sendCommand('right 10');
+			robot.sendCommand('right 30');
 		
 			wallDist = robot.getCommand().ping;
-			console.log('wallDist = ' + wallDist);	
+			console.log('MapRoom.scanInitial turnDeg=' + turnDeg + ' wallDist = ' + wallDist);	
 			
 			if ( wallDist !== null ) {
                 point = calcPoint(robot.getCommand().x ,robot.getCommand().y, wallDist, turnDeg);
@@ -48,6 +50,7 @@ function MapRoom(robot, canvas) {
     		if (canvas) canvas.clear();
     		walls.plotWalls();
 		}		
+		console.log('MapRoom.scanInitial end');	
 	}
 	/*
 	* Returns the array of walls
@@ -66,14 +69,14 @@ function MapRoom(robot, canvas) {
 		// Take away 90 to adjust for our north
 		var adjDeg = 90 - degree;
 
-		console.log("degree=" + degree + " adjDeg=" + adjDeg);
+		console.log("MapRoom.calcPoint x=" + x + " y=" + y + " distance=" + distance + " degree=" + degree + " adjDeg=" + adjDeg);
 		
 		var angle = rad(adjDeg);
 		var o = g.point(x,y );
 		
 		var newPoint = g.point.fromPolar(distance, angle, o);
 		
-		console.log('calcPoint newPoint=',newPoint);
+		console.log('MapRoom.calcPoint newPoint=',newPoint);
 		
 		
 		if (canvas)

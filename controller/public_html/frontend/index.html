@@ -38,8 +38,9 @@
 
         <input type="button" name="slow" value="slow" onclick="server.slow()">
         <input type="button" name="scan" value="scan" onclick="server.scan()">
+        <input type="button" name="scanroom" value="Scan Room Mission" onclick="scanRoomMission()">
         <p>
-        Command: <input type="text" name="command" value="" id="command" size="20"><input type="button" id="commandButton" value="Send" onclick="sendCommand()">
+        Command: <input type="text" name="command" value="" id="commandForm" size="20"><input type="button" id="commandButton" value="Send" onclick="sendCommand()">
         <p>
         <canvas id="routeCanvas" width="400" height="400"
 style="border:1px solid #d3d3d3;">
@@ -50,7 +51,7 @@ Your browser does not support the HTML5 canvas tag.</canvas>
         <script type="text/javascript" src="../scripts/lib/sylvester.js"></script>
         <script type="text/javascript" src="../scripts/lib/geometry.js"></script>
         <script type="text/javascript" src="../scripts/lib/polyk.js"></script>
-        <script type="text/javascript" src="../scripts/robot.js"></script>
+        <script type="text/javascript" src="../scripts/real-robot.js"></script>
         <script type="text/javascript" src="../scripts/room.js"></script>
         <script type="text/javascript" src="../scripts/mapgrid.js"></script>
         <script type="text/javascript" src="../scripts/mapcell.js"></script>
@@ -60,6 +61,7 @@ Your browser does not support the HTML5 canvas tag.</canvas>
         <script type="text/javascript" src="../scripts/canvas.js"></script>
         <script type="text/javascript" src="../scripts/utility.js"></script>
         <script type="text/javascript" src="../scripts/maproom.js"></script>
+        <script type="text/javascript" src="../scripts/command.js"></script>
         <script type="text/javascript" src="../scripts/frontend.js"></script>
     </body>
 </html>
