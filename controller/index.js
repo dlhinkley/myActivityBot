@@ -75,17 +75,9 @@ function processUpdateCommand(text) {
     
     var cmd = new Command(text);
     
-    
-    eurecaClient.setX(cmd.x);
-    
-    eurecaClient.setY(cmd.y);
-    
-    eurecaClient.heading(cmd.heading);
-    
-    eurecaClient.ping(cmd.ping);
+    eurecaClient.setAll( cmd.x, cmd.y, cmd.heading, cmd.ping, cmd.turet);
     
     turet.setDirection(cmd.turet);
-    eurecaClient.turet(cmd.turet);
     
 }
 function keyPressEvent(ch, key) {
@@ -173,7 +165,7 @@ function BlueTooth() {
                 
                 receivedText(rxIn);
                 rxIn = '';
-                //console.log('received=' + received);
+                console.log('received=' + received);
             }
             else {
                 
@@ -199,7 +191,9 @@ function BlueTooth() {
 
                     // Prepare response for command
                     //
-                    btSerial.on('data', btSerialDataEvent);                   
+                    btSerial.on('data', btSerialDataEvent);  
+                    
+                    self.sendCommand("connected\n");                 
                     
                 }, function (error) {
                     console.log('cannot connect',error);
@@ -231,7 +225,7 @@ function initEureca() {
     var EurecaServer = require('eureca.io').EurecaServer;
      
     //Allow the server to access these client calls
-    var eurecaServer = new EurecaServer({allow:['status','ping','setX','setY','heading','turet']});
+    var eurecaServer = new EurecaServer({allow:['status','setAll']});
      
     eurecaServer.attach(server);
      
