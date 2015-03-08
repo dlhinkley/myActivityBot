@@ -16,6 +16,12 @@
         Heading: <input size=5 type="text" name="heading" value="" id="heading">
         Turet: <input size=5 type="text" name="turet" value="" id="turet">
         <p>
+        
+        <p>Radar</p>  
+        <canvas id="radarCanvas" width="400" height="400"
+style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
         <div id="direction-container">
             <div id="direction-stop-container" style="float:left;">
                 <div style="position:relative; width: 200px; height:220px; background: url('images/control.jpg') 200px 0px;">
@@ -42,10 +48,12 @@
         <p>
         Command: <input type="text" name="command" value="" id="commandForm" size="20"><input type="button" id="commandButton" value="Send" onclick="sendCommand()">
         <p>
+        <p>Route</p>
         <canvas id="routeCanvas" width="400" height="400"
 style="border:1px solid #d3d3d3;">
-Your browser does not support the HTML5 canvas tag.</canvas>    
-        <script>
+Your browser does not support the HTML5 canvas tag.</canvas>  
+
+          <script>
 
         </script>
         <script type="text/javascript" src="../scripts/lib/sylvester.js"></script>
@@ -62,6 +70,7 @@ Your browser does not support the HTML5 canvas tag.</canvas>
         <script type="text/javascript" src="../scripts/utility.js"></script>
         <script type="text/javascript" src="../scripts/maproom.js"></script>
         <script type="text/javascript" src="../scripts/command.js"></script>
+        <script type="text/javascript" src="../scripts/radar-display.js"></script>
         <script type="text/javascript" src="../scripts/frontend.js"></script>
     </body>
 </html>
