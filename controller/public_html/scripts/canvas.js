@@ -11,6 +11,7 @@ function Canvas(id,width,height) {
 	
 	var context = this.canvas.getContext("2d");
 	
+	
 	this.clear = function() {
 		
 		context.clearRect ( 0 , 0 , this.canvas.width, this.canvas.height );
@@ -29,7 +30,24 @@ function Canvas(id,width,height) {
 		context.fillStyle = color;
 		context.strokeRect(x - (size/2), y - (size/2), size, size)
 	}
+    this.readPixel = function(x,y) {
+        
+        var imageData = context.getImageData(x, y, 1, 1);
 
+        //You can access the coloru values as follows: 
+        
+        //imageData.data[0] - Value of red in decimal (integer between 0 and 255)
+        //imageData.data[1] - value of green in decimal (integer between 0 and 255)
+        //imageData.data[2] - Value of blue in decimal (integer between 0 and 255)
+        //imageData.data[3] - Alpha value (integer between 0 and 255)
+
+        return {'red':imageData.data[0], 'green':imageData.data[1],'blue':imageData.data[2],'alpha':imageData.data[4] };
+    }
+    this.eraseArea = function(x,y,width,height) {
+        
+        context.clearRect(x,y,width,height);
+
+    }
 	this.drawCircle = function(x,y,r,color) {
 		
 		var radius = r;
