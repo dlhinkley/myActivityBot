@@ -1,5 +1,46 @@
 'use strict';
 
+QUnit.test("RadarDisplay", function(assert) {
+    
+    var canvas = new Canvas('radar',400,400);
+    
+    var radar = new RadarDisplay(canvas);
+    
+    // Make a beam at 360 and make sure it's there
+    radar.drawBeam( 100, 360 );
+    
+    assert.equal( canvas.readPixel( 200, 300 ).red,   255, 'red top');
+
+   
+    // Make a beam at 45 degrees and make sure it's there
+    radar.drawBeam( 100, 45 );
+    
+    assert.equal( canvas.readPixel( 270, 329 ).red,   255, 'red top');
+    
+
+    // Try to erase a angle that doesn't exist
+    // It should crash if coded wrong
+    radar.eraseByDegree(  24 );
+
+
+    // Erase the beam at 360 and make sure it's gone
+    //
+    radar.eraseByDegree(  360 );
+    
+    assert.equal( canvas.readPixel( 200, 300 ).green, 0, 'green top');
+    assert.equal( canvas.readPixel( 200, 300 ).red,   0, 'red top');
+    assert.equal( canvas.readPixel( 200, 300 ).blue,  0, 'blue top');
+    
+
+    // Erase the beam at 45 and make sure it's gone
+    radar.eraseByDegree(  45 );
+    
+    assert.equal( canvas.readPixel( 270, 329 ).green, 0, 'green top');
+    assert.equal( canvas.readPixel( 270, 329 ).red,   0, 'red top');
+    assert.equal( canvas.readPixel( 270, 329 ).blue,  0, 'blue top');
+    
+        
+});
 QUnit.test("Command", function(assert) {
     
     var text = "command=update,x=100.000,y=250.000,heading=180.00,ping=15,turet=25,scan=65\n";
