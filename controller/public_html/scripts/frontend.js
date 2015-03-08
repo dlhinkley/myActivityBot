@@ -6,47 +6,35 @@ var robot = null;
 var x = 0;
 var y = 0;
 
+
+var radarCanvas  = new Canvas('radarCanvas', 400, 200);
+var radarDisplay = new RadarDisplay(radarCanvas);	
+
+
 // Client functions the server can call
  client.exports.status = function (text)
 {
     //console.log("status text=" + text);
     $('#status').val(text);
 }
- client.exports.ping = function (text)
+ client.exports.setAll = function (x, y, heading, ping, turet)
 {
     //console.log("ping text=" + text);
-    $('#ping').val(text);
-    robot.command.ping = parseInt(text);
-    //console.log('ping robot=',robot);
-}             
- client.exports.setX = function (text)
-{
-    x = text;
-    //console.log("x text=" + text);
-    $('#x').val(text);
-    robot.command.x = parseInt(text);
-}             
- client.exports.setY = function (text)
-{
-    y = text;
-    //console.log("x text=" + text);
-    $('#y').val(text);
-    robot.command.y = parseInt(text);
-}             
- client.exports.heading = function (text)
-{
-    //console.log("heading text=" + text);
-
-    $('#heading').val(text);
-    robot.command.heading = parseInt(text);
+    $('#ping').val(ping);
+    $('#x').val(x);
+    $('#y').val(y);
+    $('#heading').val(heading);
+    $('#turet').val(turet);
+    
+    robot.command.ping      = parseInt(ping);
+    robot.command.x         = parseInt(x);
+    robot.command.y         = parseInt(y);
+    robot.command.heading   = parseInt(heading);
+    robot.command.turet     = parseInt(turet);
 
     drawLocation(x,y);
-}             
- client.exports.turet = function (text)
-{
-    //console.log("turet text=" + text);
-    $('#turet').val(text);
-    robot.command.turet = parseInt(text);
+    
+    radarDisplay.drawAndErase( robot.command.ping, robot.command.turet );
 }             
 
 client.ready(function (proxy) {
