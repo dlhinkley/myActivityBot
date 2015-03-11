@@ -34,6 +34,7 @@ static double trackWidth, distancePerCount;
 
 static volatile double heading = 0.0, x = 0.0, y = 0.0, degHeading;
 static volatile int pingRange0 = 0, turetHeading = 0, connected = 0, turetScan = 0;
+char lastcmdbuf[10];                             // Command buffer
 
 
 // Define subroutines
@@ -65,7 +66,7 @@ int main()
 	cogstart(&pollPingSensors, NULL, pstack, sizeof(pstack));
 
 
-	freqout(4, 2000, 2000);               // Start beep - low battery reset alarm
+	freqout(5, 2000, 2000);               // Start beep - low battery reset alarm http://learn.parallax.com/propeller-c-simple-circuits/piezo-beep
 
 	trackWidth = 0.1058; // http://learn.parallax.com/activitybot/calculating-angles-rotation
 	distancePerCount = 0.00325;
@@ -159,40 +160,57 @@ void executeCommand(char cmdbuf[], int  val) {
 	else if ( strcmp(cmdbuf,"up") == 0 ) {
 		drive_goto(val,val);
 	}
-	else if ( strcmp(cmdbuf,"rampUp") == 0 ) {
+	else if ( strcmp(cmdbuf,"rampUp") == 0 && ( strcmp(lastcmdbuf,"rampUp") == 0 || strcmp(lastcmdbuf,"rampDown") == 0 ) ) {
+		drive_rampStep(128, 128);   // Forward
+	}
+	else if ( strcmp(cmdbuf,"rampUp") == 0   ) {
+     drive_ramp(0,0);
 		drive_rampStep(128, 128);   // Forward
 	}
 	else if ( strcmp(cmdbuf,"down") == 0 ) {
 		drive_goto(-val,-val);
 	}
+	else if ( strcmp(cmdbuf,"rampDown") == 0 && ( strcmp(lastcmdbuf,"rampDown") == 0 || strcmp(lastcmdbuf,"rampUp") == 0) ) {
+		drive_rampStep(-128, -128); // Backward
+	}
 	else if ( strcmp(cmdbuf,"rampDown") == 0 ) {
+     drive_ramp(0,0);
 		drive_rampStep(-128, -128); // Backward
 	}
 	else if ( strcmp(cmdbuf,"left") == 0  ) {
 		int steps = val * 0.284; // convert angle into degree
 		drive_goto(-steps,steps);
 	}
+	else if ( strcmp(cmdbuf,"rampLeft") == 0  && ( strcmp(lastcmdbuf,"rampLeft") == 0 || strcmp(lastcmdbuf,"rampRight") == 0)  ) {
+		drive_rampStep(-128, 128); // Left turn
+	}
 	else if ( strcmp(cmdbuf,"rampLeft") == 0  ) {
+     drive_ramp(0,0);
 		drive_rampStep(-128, 128); // Left turn
 	}
 	else if ( strcmp(cmdbuf,"right") == 0  ) {
 		int steps = val * 0.284; // convert angle into degree
 		drive_goto(steps,-steps);
 	}
+	else if ( strcmp(cmdbuf,"rampRight") == 0  && ( strcmp(lastcmdbuf,"rampRight") == 0 || strcmp(lastcmdbuf,"rampLeft") == 0 ) ) {
+		drive_rampStep(128, -128); // Right turn 
+	}
 	else if ( strcmp(cmdbuf,"rampRight") == 0  ) {
+     drive_ramp(0,0);
 		drive_rampStep(128, -128); // Right turn 
 	}
 	else if ( strcmp(cmdbuf,"slow") == 0 ) {
 		drive_rampStep(0, 0);        // Slow
 	}
 	else if ( strcmp(cmdbuf,"stop") == 0  ) {
-		drive_speed(0, 0);        // Stop
+		drive_ramp(0, 0);        // Stop
 	}
 	else if ( strcmp(cmdbuf,"turet") == 0  ) {
 		int dir = (val * 10) + correction;
 		servo_angle(TUR, dir);
 		turetHeading = val;
 	}
+   strcpy(lastcmdbuf,cmdbuf);
 }  
 
 
